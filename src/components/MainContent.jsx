@@ -1,17 +1,24 @@
 import React from "react";
-import { useState, useEffect } from "react";
-
+import { useState, useEffect, useRef } from "react";
 import { FileText, Plus } from "lucide-react";
 import "../styles/MainContent.css";
 
 const MainContent = ({ selectedNote, onUpdateNote, onCreateNote }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const titleInputRef = useRef(null);
 
   useEffect(() => {
     if (selectedNote) {
       setTitle(selectedNote.title || "");
       setContent(selectedNote.content || "");
+
+      // Auto-select title text for new notes
+      if (selectedNote.title === "New Note" && titleInputRef.current) {
+        setTimeout(() => {
+          titleInputRef.current.select();
+        }, 100);
+      }
     }
   }, [selectedNote]);
 
@@ -55,6 +62,7 @@ const MainContent = ({ selectedNote, onUpdateNote, onCreateNote }) => {
     <div className="main-content">
       <div className="note-editor">
         <input
+          ref={titleInputRef}
           type="text"
           value={title}
           onChange={handleTitleChange}

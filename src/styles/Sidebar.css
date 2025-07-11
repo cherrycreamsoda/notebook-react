@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  outline: none;
 }
 
 .sidebar-header {
@@ -60,7 +61,7 @@
 
 .search-input {
   width: 100%;
-  padding: 8px 12px 8px 36px;
+  padding: 8px 36px 8px 36px;
   border: none;
   border-radius: 4px;
   background-color: var(--bg-tertiary);
@@ -71,6 +72,28 @@
 
 .search-input::placeholder {
   color: var(--text-tertiary);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.search-clear-btn:hover {
+  color: var(--text-secondary);
+  background-color: var(--hover-bg);
 }
 
 .notes-section {
@@ -86,6 +109,30 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 20px;
+}
+
+.section-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  color: var(--text-primary);
+  background-color: var(--hover-bg);
 }
 
 .section-title {
@@ -162,6 +209,11 @@
   color: var(--selected-text);
 }
 
+.note-item.keyboard-selected {
+  outline: 2px solid var(--text-tertiary);
+  outline-offset: -2px;
+}
+
 .note-item.selected .note-title,
 .note-item.selected .note-preview,
 .note-item.selected .note-date {
@@ -228,11 +280,42 @@
   color: var(--text-secondary);
 }
 
-.note-action-btn.active {
-  color: #ff9500;
+/* Pin button - always visible when active, glowing yellow */
+.note-action-btn.pin-btn.active {
+  color: #ff9500 !important;
+  opacity: 1 !important;
+}
+
+/* Make pinned notes show the pin icon always */
+.note-item:has(.pin-btn.active) .note-actions {
+  opacity: 1;
+}
+
+/* Only show the pin icon when pinned, hide other buttons */
+.note-item:has(.pin-btn.active) .note-actions .note-action-btn:not(.pin-btn) {
+  opacity: 0;
+}
+
+.note-item:has(.pin-btn.active):hover
+  .note-actions
+  .note-action-btn:not(.pin-btn) {
+  opacity: 1;
+}
+
+/* Fallback for browsers that don't support :has() */
+.note-item .note-actions .pin-btn.active {
+  opacity: 1 !important;
 }
 
 .note-action-btn.delete:hover {
+  color: #ff3b30;
+}
+
+.note-action-btn.restore:hover {
+  color: #34c759;
+}
+
+.note-action-btn.permanent-delete:hover {
   color: #ff3b30;
 }
 
@@ -253,8 +336,24 @@
   cursor: pointer;
   padding: 4px 0;
   transition: color 0.2s ease;
+  position: relative;
 }
 
 .footer-item:hover {
   color: var(--text-primary);
+}
+
+.footer-item.active {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.footer-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.footer-item.active .footer-count {
+  color: var(--text-secondary);
 }

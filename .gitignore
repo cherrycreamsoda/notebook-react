@@ -35,3 +35,4 @@ coverage/
 .cache/
 public/static/
 package-lock.json
+notebook-react.zip
