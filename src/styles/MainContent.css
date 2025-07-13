@@ -61,14 +61,21 @@
   padding: 40px;
 }
 
+.note-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
 .note-title-input {
+  flex: 1;
   border: none;
   outline: none;
   background: none;
   font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 20px;
   padding: 0;
   line-height: 1.2;
 }
@@ -91,4 +98,34 @@
 
 .note-content-input::placeholder {
   color: var(--text-tertiary);
+}
+
+.saving-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  margin-left: auto;
+  opacity: 0.8;
+}
+
+.saving-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--text-tertiary);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
 }

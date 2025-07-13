@@ -6,7 +6,9 @@ import "../styles/MainContent.css";
 const MainContent = ({ selectedNote, onUpdateNote, onCreateNote }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const titleInputRef = useRef(null);
+  const updateTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (selectedNote) {
@@ -22,21 +24,50 @@ const MainContent = ({ selectedNote, onUpdateNote, onCreateNote }) => {
     }
   }, [selectedNote]);
 
+  // Debounced update function - waits 500ms after user stops typing
+  const debouncedUpdate = (field, value) => {
+    if (!selectedNote) return;
+
+    // Clear existing timeout
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+
+    // Set saving state
+    setIsSaving(true);
+
+    // Set new timeout
+    updateTimeoutRef.current = setTimeout(async () => {
+      try {
+        await onUpdateNote(selectedNote._id, { [field]: value });
+      } catch (error) {
+        console.error("Error updating note:", error);
+      } finally {
+        setIsSaving(false);
+      }
+    }, 500); // Wait 500ms after user stops typing
+  };
+
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    if (selectedNote) {
-      onUpdateNote(selectedNote.id, { title: newTitle });
-    }
+    debouncedUpdate("title", newTitle);
   };
 
   const handleContentChange = (e) => {
     const newContent = e.target.value;
     setContent(newContent);
-    if (selectedNote) {
-      onUpdateNote(selectedNote.id, { content: newContent });
-    }
+    debouncedUpdate("content", newContent);
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!selectedNote) {
     return (
@@ -61,14 +92,22 @@ const MainContent = ({ selectedNote, onUpdateNote, onCreateNote }) => {
   return (
     <div className="main-content">
       <div className="note-editor">
-        <input
-          ref={titleInputRef}
-          type="text"
-          value={title}
-          onChange={handleTitleChange}
-          placeholder="Note title..."
-          className="note-title-input"
-        />
+        <div className="note-header">
+          <input
+            ref={titleInputRef}
+            type="text"
+            value={title}
+            onChange={handleTitleChange}
+            placeholder="Note title..."
+            className="note-title-input"
+          />
+          {isSaving && (
+            <div className="saving-indicator">
+              <div className="saving-dot"></div>
+              <span>Saving</span>
+            </div>
+          )}
+        </div>
         <textarea
           value={content}
           onChange={handleContentChange}

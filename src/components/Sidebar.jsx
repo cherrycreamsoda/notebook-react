@@ -14,6 +14,8 @@ import {
   Trash,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import LoadingSpinner from "./LoadingSpinner";
+import ConfirmationDialog from "./ConfirmationDialog";
 import "../styles/Sidebar.css";
 
 const Sidebar = ({
@@ -27,19 +29,23 @@ const Sidebar = ({
   onSearchChange,
   currentView,
   onViewChange,
-  allNotes,
   onPermanentDelete,
   onRestoreNote,
+  onClearAllDeleted,
+  pinnedCount,
+  deletedCount,
 }) => {
   const { isDark, toggleTheme } = useTheme();
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [loadingStates, setLoadingStates] = useState({}); // Track loading for individual actions
+  const [confirmDialog, setConfirmDialog] = useState(null); // For confirmation dialogs
   const searchInputRef = useRef(null);
   const sidebarRef = useRef(null);
 
   // Update selected index when notes or selectedNote changes
   useEffect(() => {
     if (selectedNote) {
-      const index = notes.findIndex((note) => note.id === selectedNote.id);
+      const index = notes.findIndex((note) => note._id === selectedNote._id);
       setSelectedIndex(index);
     } else {
       setSelectedIndex(-1);
@@ -49,13 +55,19 @@ const Sidebar = ({
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Handle ESC key for search
-      if (e.key === "Escape" && searchTerm) {
-        onSearchChange("");
-        if (searchInputRef.current) {
-          searchInputRef.current.blur();
+      // Handle ESC key for search and confirmation dialog
+      if (e.key === "Escape") {
+        if (confirmDialog) {
+          setConfirmDialog(null);
+          return;
         }
-        return;
+        if (searchTerm) {
+          onSearchChange("");
+          if (searchInputRef.current) {
+            searchInputRef.current.blur();
+          }
+          return;
+        }
       }
 
       // Only handle arrow keys if sidebar is focused or no input is focused
@@ -89,7 +101,26 @@ const Sidebar = ({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex, notes, searchTerm, onSearchChange, onSelectNote]);
+  }, [
+    selectedIndex,
+    notes,
+    searchTerm,
+    onSearchChange,
+    onSelectNote,
+    confirmDialog,
+  ]);
+
+  // Close confirmation dialog when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (confirmDialog && !e.target.closest(".confirmation-dialog")) {
+        setConfirmDialog(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [confirmDialog]);
 
   const formatDate = (date) => {
     const now = new Date();
@@ -116,17 +147,30 @@ const Sidebar = ({
 
   const handleBackToNotes = () => {
     onViewChange("notes");
-    onSearchChange(""); // Clear search when going back
   };
 
   const handlePinnedClick = () => {
     onViewChange("pinned");
-    onSearchChange(""); // Clear search when switching views
   };
 
+  // Check if we should show delete permanently mode
+  const isDeletePermanentlyMode = currentView === "deleted" && deletedCount > 0;
+
   const handleDeletedClick = () => {
-    onViewChange("deleted");
-    onSearchChange(""); // Clear search when switching views
+    if (isDeletePermanentlyMode) {
+      // Show confirmation for delete all
+      setConfirmDialog({
+        action: "clearAll",
+        message: `Permanently delete all ${deletedCount} deleted notes?`,
+        position: {
+          top: window.innerHeight / 2 - 50,
+          left: window.innerWidth / 2 - 150,
+        },
+      });
+    } else {
+      // Just switch to deleted view
+      onViewChange("deleted");
+    }
   };
 
   const getSectionTitle = () => {
@@ -140,13 +184,51 @@ const Sidebar = ({
     }
   };
 
-  const getPinnedCount = () => {
-    return allNotes.filter((note) => !note.isDeleted && note.isPinned).length;
+  // Helper function to handle actions with loading states
+  const handleAction = async (actionFn, actionId) => {
+    try {
+      setLoadingStates((prev) => ({ ...prev, [actionId]: true }));
+      await actionFn();
+    } catch (error) {
+      console.error("Action failed:", error);
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, [actionId]: false }));
+    }
   };
 
-  const getDeletedCount = () => {
-    return allNotes.filter((note) => note.isDeleted).length;
+  // Handle permanent delete with confirmation
+  const handlePermanentDelete = (noteId, event) => {
+    const rect = event.target.getBoundingClientRect();
+    setConfirmDialog({
+      noteId,
+      message: "Permanently delete this note?",
+      position: {
+        top: rect.top - 80,
+        left: rect.left - 150,
+      },
+    });
   };
+
+  const confirmPermanentDelete = async () => {
+    if (confirmDialog.noteId) {
+      await handleAction(
+        () => onPermanentDelete(confirmDialog.noteId),
+        `permanent-${confirmDialog.noteId}`
+      );
+    } else if (confirmDialog.action === "clearAll") {
+      await handleAction(onClearAllDeleted, "clearAll");
+    }
+    setConfirmDialog(null);
+  };
+
+  console.log(
+    "Sidebar render - currentView:",
+    currentView,
+    "deletedCount:",
+    deletedCount,
+    "isDeletePermanentlyMode:",
+    isDeletePermanentlyMode
+  );
 
   return (
     <div className="sidebar" ref={sidebarRef} tabIndex={0}>
@@ -162,10 +244,15 @@ const Sidebar = ({
           </button>
           <button
             className="icon-button"
-            onClick={onCreateNote}
+            onClick={() => handleAction(onCreateNote, "create")}
             title="Create new note"
+            disabled={loadingStates.create}
           >
-            <Plus size={16} />
+            {loadingStates.create ? (
+              <LoadingSpinner size={16} inline={true} showMessage={false} />
+            ) : (
+              <Plus size={16} />
+            )}
           </button>
         </div>
       </div>
@@ -205,7 +292,9 @@ const Sidebar = ({
             )}
             <span className="section-title">{getSectionTitle()}</span>
           </div>
-          <span className="notes-count">{notes.length} notes</span>
+          <div className="section-actions">
+            <span className="notes-count">{notes.length} notes</span>
+          </div>
         </div>
 
         <div className="notes-list">
@@ -233,9 +322,9 @@ const Sidebar = ({
           ) : (
             notes.map((note, index) => (
               <div
-                key={note.id}
+                key={note._id}
                 className={`note-item ${
-                  selectedNote?.id === note.id ? "selected" : ""
+                  selectedNote?._id === note._id ? "selected" : ""
                 } ${index === selectedIndex ? "keyboard-selected" : ""}`}
                 onClick={() => {
                   onSelectNote(note);
@@ -259,41 +348,68 @@ const Sidebar = ({
                         className="note-action-btn restore"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onRestoreNote(note.id);
+                          handleAction(
+                            () => onRestoreNote(note._id),
+                            `restore-${note._id}`
+                          );
                         }}
                         title="Restore note"
+                        disabled={loadingStates[`restore-${note._id}`]}
                       >
-                        <RotateCcw size={14} />
+                        {loadingStates[`restore-${note._id}`] ? (
+                          <LoadingSpinner
+                            size={14}
+                            inline={true}
+                            showMessage={false}
+                          />
+                        ) : (
+                          <RotateCcw size={14} />
+                        )}
                       </button>
                       <button
                         className="note-action-btn permanent-delete"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (
-                            window.confirm(
-                              "Are you sure you want to permanently delete this note? This action cannot be undone."
-                            )
-                          ) {
-                            onPermanentDelete(note.id);
-                          }
+                          handlePermanentDelete(note._id, e);
                         }}
                         title="Delete permanently"
+                        disabled={loadingStates[`permanent-${note._id}`]}
                       >
-                        <Trash size={14} />
+                        {loadingStates[`permanent-${note._id}`] ? (
+                          <LoadingSpinner
+                            size={14}
+                            inline={true}
+                            showMessage={false}
+                          />
+                        ) : (
+                          <Trash size={14} />
+                        )}
                       </button>
                     </>
                   ) : (
-                    /* For active notes - show delete and pin (pin always visible when active) */
+                    /* For active notes - show delete and pin */
                     <>
                       <button
                         className="note-action-btn delete"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDeleteNote(note.id);
+                          handleAction(
+                            () => onDeleteNote(note._id),
+                            `delete-${note._id}`
+                          );
                         }}
                         title="Delete note"
+                        disabled={loadingStates[`delete-${note._id}`]}
                       >
-                        <Trash2 size={14} />
+                        {loadingStates[`delete-${note._id}`] ? (
+                          <LoadingSpinner
+                            size={14}
+                            inline={true}
+                            showMessage={false}
+                          />
+                        ) : (
+                          <Trash2 size={14} />
+                        )}
                       </button>
                       <button
                         className={`note-action-btn pin-btn ${
@@ -301,11 +417,23 @@ const Sidebar = ({
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          onTogglePin(note.id);
+                          handleAction(
+                            () => onTogglePin(note._id),
+                            `pin-${note._id}`
+                          );
                         }}
                         title={note.isPinned ? "Unpin note" : "Pin note"}
+                        disabled={loadingStates[`pin-${note._id}`]}
                       >
-                        <Pin size={14} />
+                        {loadingStates[`pin-${note._id}`] ? (
+                          <LoadingSpinner
+                            size={14}
+                            inline={true}
+                            showMessage={false}
+                          />
+                        ) : (
+                          <Pin size={14} />
+                        )}
                       </button>
                     </>
                   )}
@@ -323,17 +451,38 @@ const Sidebar = ({
         >
           <Pin size={16} />
           <span>Pinned</span>
-          <span className="footer-count">({getPinnedCount()})</span>
+          <span className="footer-count">({pinnedCount})</span>
         </div>
         <div
-          className={`footer-item ${currentView === "deleted" ? "active" : ""}`}
+          className={`footer-item ${
+            currentView === "deleted" ? "active" : ""
+          } ${isDeletePermanentlyMode ? "delete-all-mode" : ""}`}
           onClick={handleDeletedClick}
+          title={
+            isDeletePermanentlyMode
+              ? "Delete all permanently"
+              : "View deleted notes"
+          }
         >
           <Trash2 size={16} />
-          <span>Deleted</span>
-          <span className="footer-count">({getDeletedCount()})</span>
+          <span>
+            {isDeletePermanentlyMode ? "Delete Permanently" : "Deleted"}
+          </span>
+          <span className="footer-count">({deletedCount})</span>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      {confirmDialog && (
+        <ConfirmationDialog
+          message={confirmDialog.message}
+          position={confirmDialog.position}
+          onConfirm={confirmPermanentDelete}
+          onCancel={() => setConfirmDialog(null)}
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
+      )}
     </div>
   );
 };
