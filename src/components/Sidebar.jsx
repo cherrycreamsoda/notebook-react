@@ -254,9 +254,7 @@ const Sidebar = ({
   return (
     <div className="sidebar sidebar-expanded" ref={sidebarRef} tabIndex={0}>
       <div className="sidebar-header">
-        <div className="sidebar-brand">
-          <h1 className="brand-title">NOTES.</h1>
-        </div>
+        <div className="sidebar-brand"></div>
         <div className="sidebar-header-actions">
           <button
             className="header-action-btn"
@@ -465,6 +463,28 @@ const Sidebar = ({
                     ) : (
                       <>
                         <button
+                          className="note-action-btn delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAction(
+                              () => onDeleteNote(note._id),
+                              `delete-${note._id}`
+                            );
+                          }}
+                          title="Delete note"
+                          disabled={loadingStates[`delete-${note._id}`]}
+                        >
+                          {loadingStates[`delete-${note._id}`] ? (
+                            <LoadingSpinner
+                              size={12}
+                              inline={true}
+                              showMessage={false}
+                            />
+                          ) : (
+                            <Trash2 size={12} />
+                          )}
+                        </button>
+                        <button
                           className={`note-action-btn pin ${
                             note.isPinned ? "active" : ""
                           }`}
@@ -486,28 +506,6 @@ const Sidebar = ({
                             />
                           ) : (
                             <Pin size={12} />
-                          )}
-                        </button>
-                        <button
-                          className="note-action-btn delete"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAction(
-                              () => onDeleteNote(note._id),
-                              `delete-${note._id}`
-                            );
-                          }}
-                          title="Delete note"
-                          disabled={loadingStates[`delete-${note._id}`]}
-                        >
-                          {loadingStates[`delete-${note._id}`] ? (
-                            <LoadingSpinner
-                              size={12}
-                              inline={true}
-                              showMessage={false}
-                            />
-                          ) : (
-                            <Trash2 size={12} />
                           )}
                         </button>
                       </>

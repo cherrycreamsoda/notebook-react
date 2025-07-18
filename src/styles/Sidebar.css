@@ -108,7 +108,7 @@
 
 /* Search */
 .search-container {
-  padding: 0 8px 16px 8px;
+  padding: 8px 8px 16px 8px;
   animation: slideInFromLeft 0.4s ease-out 0.1s both;
 }
 
@@ -139,7 +139,7 @@
 }
 
 .search-input:focus {
-  border-color: #f59e0b;
+  border: none;
   background-color: #2a2a2a;
 }
 
@@ -255,21 +255,22 @@
   padding: 8px 12px;
   background-color: #141414;
   border-radius: 6px;
+
   animation: slideInFromLeft 0.4s ease-out 0.3s both;
 }
 
 .section-title-container {
+  min-height: 24px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .back-button {
-  background: #2a2a2a;
   border: none;
   color: #6b7280;
   cursor: pointer;
-  padding: 6px;
+
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -281,7 +282,7 @@
 
 .back-button:hover {
   color: #9ca3af;
-  background-color: #404040;
+  background-color: #343434;
 }
 
 .section-title {
@@ -289,6 +290,7 @@
   font-weight: 600;
   color: #ffffff;
   margin: 0;
+  animation: slideInFromLeft 0.4s;
 }
 
 .section-count {
@@ -363,12 +365,11 @@
 }
 
 .note-item.selected {
-  background-color: #2a2a2a;
-  border-color: #f59e0b;
+  background-color: #181818;
+  border-color: #181818;
 }
 
 .note-item.keyboard-selected {
-  outline: 2px solid #f59e0b;
   outline-offset: -2px;
 }
 
@@ -446,7 +447,6 @@
 }
 
 .note-action-btn {
-  background: #2a2a2a;
   border: none;
   padding: 6px;
   border-radius: 50%;
@@ -461,7 +461,6 @@
 }
 
 .note-action-btn:hover {
-  background-color: #404040;
   color: #9ca3af;
 }
 
@@ -471,7 +470,11 @@
 }
 
 .note-action-btn.delete:hover {
-  color: #ef4444;
+  color: #991b1b;
+  background-color: #f03b3b;
+}
+.note-action-btn.pin:hover {
+  color: #f59e0b;
 }
 
 .note-action-btn.restore:hover {
@@ -479,7 +482,8 @@
 }
 
 .note-action-btn.permanent-delete:hover {
-  color: #ef4444;
+  color: #991b1b;
+  background-color: #f03b3b;
 }
 
 /* Animations */
