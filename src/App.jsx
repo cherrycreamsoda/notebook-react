@@ -1,5 +1,4 @@
 import React from "react";
-("use client");
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Sidebar from "./components/Sidebar";
@@ -15,6 +14,7 @@ function App() {
   const [selectedNote, setSelectedNote] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentView, setCurrentView] = useState("notes"); // "notes", "pinned", "deleted"
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Loading and error states
   const [initialLoading, setInitialLoading] = useState(true);
@@ -259,11 +259,6 @@ function App() {
     (note) => note.isDeleted
   ).length;
 
-  console.log("Current view:", currentView);
-  console.log("All notes for counts:", allNotesForCounts.length);
-  console.log("Deleted count:", deletedCount);
-  console.log("Pinned count:", pinnedCount);
-
   // Show loading spinner while connecting
   if (initialLoading) {
     return (
@@ -304,12 +299,16 @@ function App() {
           onViewChange={handleViewChange}
           pinnedCount={pinnedCount}
           deletedCount={deletedCount}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
 
         <MainContent
           selectedNote={selectedNote}
           onUpdateNote={updateNote}
           onCreateNote={createNote}
+          sidebarCollapsed={sidebarCollapsed}
+          onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
       </div>
     </ThemeProvider>

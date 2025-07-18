@@ -12,6 +12,9 @@ import {
   ArrowLeft,
   RotateCcw,
   Trash,
+  StickyNote,
+  PanelLeftClose,
+  Github,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import LoadingSpinner from "./LoadingSpinner";
@@ -34,11 +37,18 @@ const Sidebar = ({
   onClearAllDeleted,
   pinnedCount,
   deletedCount,
+  collapsed,
+  onToggleCollapse,
 }) => {
   const { isDark, toggleTheme } = useTheme();
   const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [loadingStates, setLoadingStates] = useState({}); // Track loading for individual actions
-  const [confirmDialog, setConfirmDialog] = useState(null); // For confirmation dialogs
+  const [loadingStates, setLoadingStates] = useState({});
+  const [confirmDialog, setConfirmDialog] = useState(null);
+  const [expandedSections, setExpandedSections] = useState({
+    notes: true,
+    pinned: true,
+    deleted: true,
+  });
   const searchInputRef = useRef(null);
   const sidebarRef = useRef(null);
 
@@ -55,7 +65,6 @@ const Sidebar = ({
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Handle ESC key for search and confirmation dialog
       if (e.key === "Escape") {
         if (confirmDialog) {
           setConfirmDialog(null);
@@ -70,7 +79,6 @@ const Sidebar = ({
         }
       }
 
-      // Only handle arrow keys if sidebar is focused or no input is focused
       const activeElement = document.activeElement;
       const isInputFocused =
         activeElement &&
@@ -153,12 +161,10 @@ const Sidebar = ({
     onViewChange("pinned");
   };
 
-  // Check if we should show delete permanently mode
   const isDeletePermanentlyMode = currentView === "deleted" && deletedCount > 0;
 
   const handleDeletedClick = () => {
     if (isDeletePermanentlyMode) {
-      // Show confirmation for delete all
       setConfirmDialog({
         action: "clearAll",
         message: `Permanently delete all ${deletedCount} deleted notes?`,
@@ -168,7 +174,6 @@ const Sidebar = ({
         },
       });
     } else {
-      // Just switch to deleted view
       onViewChange("deleted");
     }
   };
@@ -184,7 +189,6 @@ const Sidebar = ({
     }
   };
 
-  // Helper function to handle actions with loading states
   const handleAction = async (actionFn, actionId) => {
     try {
       setLoadingStates((prev) => ({ ...prev, [actionId]: true }));
@@ -196,7 +200,6 @@ const Sidebar = ({
     }
   };
 
-  // Handle permanent delete with confirmation
   const handlePermanentDelete = (noteId, event) => {
     const rect = event.target.getBoundingClientRect();
     setConfirmDialog({
@@ -221,29 +224,42 @@ const Sidebar = ({
     setConfirmDialog(null);
   };
 
-  console.log(
-    "Sidebar render - currentView:",
-    currentView,
-    "deletedCount:",
-    deletedCount,
-    "isDeletePermanentlyMode:",
-    isDeletePermanentlyMode
-  );
+  const toggleSection = (section) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const handleGithubClick = () => {
+    window.open("https://github.com/cherrycreamsoda", "_blank");
+  };
+
+  if (collapsed) {
+    return (
+      <div className="sidebar sidebar-collapsed">
+        <div className="sidebar-toggle-collapsed">
+          <button
+            className="github-btn"
+            onClick={handleGithubClick}
+            title="Visit GitHub Profile"
+          >
+            <Github size={16} />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="sidebar" ref={sidebarRef} tabIndex={0}>
+    <div className="sidebar sidebar-expanded" ref={sidebarRef} tabIndex={0}>
       <div className="sidebar-header">
-        <h1 className="sidebar-title">Notes.</h1>
-        <div className="sidebar-actions">
+        <div className="sidebar-brand">
+          <h1 className="brand-title">NOTES.</h1>
+        </div>
+        <div className="sidebar-header-actions">
           <button
-            className="icon-button"
-            onClick={toggleTheme}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          <button
-            className="icon-button"
+            className="header-action-btn"
             onClick={() => handleAction(onCreateNote, "create")}
             title="Create new note"
             disabled={loadingStates.create}
@@ -254,221 +270,253 @@ const Sidebar = ({
               <Plus size={16} />
             )}
           </button>
+          <button
+            className="header-action-btn"
+            onClick={toggleTheme}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+          <button
+            className="sidebar-toggle-btn"
+            onClick={onToggleCollapse}
+            title="Collapse Sidebar"
+          >
+            <PanelLeftClose size={16} />
+          </button>
         </div>
       </div>
 
-      <div className="search-container">
-        <Search size={16} className="search-icon" />
-        <input
-          ref={searchInputRef}
-          type="text"
-          placeholder="Search notes..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="search-input"
-        />
-        {searchTerm && (
-          <button
-            className="search-clear-btn"
-            onClick={clearSearch}
-            title="Clear search"
-          >
-            <X size={16} />
-          </button>
-        )}
-      </div>
-
-      <div className="notes-section">
-        <div className="section-header">
-          <div className="section-title-container">
-            {currentView !== "notes" && (
+      <div className="sidebar-content">
+        <div className="search-container">
+          <div className="search-input-wrapper">
+            <Search size={16} className="search-icon" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search notes..."
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="search-input"
+            />
+            {searchTerm && (
               <button
-                className="back-button"
-                onClick={handleBackToNotes}
-                title="Back to notes"
+                className="search-clear-btn"
+                onClick={clearSearch}
+                title="Clear search"
               >
-                <ArrowLeft size={16} />
+                <X size={14} />
               </button>
             )}
-            <span className="section-title">{getSectionTitle()}</span>
-          </div>
-          <div className="section-actions">
-            <span className="notes-count">{notes.length} notes</span>
           </div>
         </div>
 
-        <div className="notes-list">
-          {notes.length === 0 ? (
-            <div className="empty-state">
-              <FileX2 size={48} className="empty-icon" />
-              <p className="empty-text">
-                {currentView === "pinned"
-                  ? "No pinned notes"
-                  : currentView === "deleted"
-                  ? "No deleted notes"
-                  : searchTerm
-                  ? "No notes found"
-                  : "No notes found"}
-              </p>
-              {currentView === "notes" && !searchTerm && (
+        <div className="sidebar-nav">
+          <div className="nav-section">
+            <button
+              className={`nav-item ${currentView === "notes" ? "active" : ""}`}
+              onClick={() => onViewChange("notes")}
+            >
+              <StickyNote size={16} />
+              <span>All Notes</span>
+              <span className="nav-count">{notes.length}</span>
+            </button>
+
+            <button
+              className={`nav-item ${currentView === "pinned" ? "active" : ""}`}
+              onClick={handlePinnedClick}
+            >
+              <Pin size={16} />
+              <span>Pinned</span>
+              <span className="nav-count">{pinnedCount}</span>
+            </button>
+
+            <button
+              className={`nav-item ${
+                currentView === "deleted" ? "active" : ""
+              } ${isDeletePermanentlyMode ? "delete-mode" : ""}`}
+              onClick={handleDeletedClick}
+              title={
+                isDeletePermanentlyMode
+                  ? "Delete all permanently"
+                  : "View deleted notes"
+              }
+            >
+              <Trash2 size={16} />
+              <span>{isDeletePermanentlyMode ? "Delete All" : "Deleted"}</span>
+              <span className="nav-count">{deletedCount}</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="notes-section">
+          <div className="section-header">
+            <div className="section-title-container">
+              {currentView !== "notes" && (
                 <button
-                  className="create-first-note-btn"
-                  onClick={onCreateNote}
+                  className="back-button"
+                  onClick={handleBackToNotes}
+                  title="Back to notes"
                 >
-                  Create your first note
+                  <ArrowLeft size={14} />
                 </button>
               )}
+              <h3 className="section-title">{getSectionTitle()}</h3>
             </div>
-          ) : (
-            notes.map((note, index) => (
-              <div
-                key={note._id}
-                className={`note-item ${
-                  selectedNote?._id === note._id ? "selected" : ""
-                } ${index === selectedIndex ? "keyboard-selected" : ""}`}
-                onClick={() => {
-                  onSelectNote(note);
-                  setSelectedIndex(index);
-                }}
-              >
-                <div className="note-content">
-                  <h3 className="note-title">{note.title || "Untitled"}</h3>
-                  <p className="note-preview">
-                    {getPreview(note.content) || "No additional text"}
-                  </p>
-                  <span className="note-date">
-                    {formatDate(note.updatedAt)}
-                  </span>
-                </div>
-                <div className="note-actions">
-                  {/* For deleted notes - show restore and permanent delete */}
-                  {note.isDeleted ? (
-                    <>
-                      <button
-                        className="note-action-btn restore"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction(
-                            () => onRestoreNote(note._id),
-                            `restore-${note._id}`
-                          );
-                        }}
-                        title="Restore note"
-                        disabled={loadingStates[`restore-${note._id}`]}
-                      >
-                        {loadingStates[`restore-${note._id}`] ? (
-                          <LoadingSpinner
-                            size={14}
-                            inline={true}
-                            showMessage={false}
-                          />
-                        ) : (
-                          <RotateCcw size={14} />
-                        )}
-                      </button>
-                      <button
-                        className="note-action-btn permanent-delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePermanentDelete(note._id, e);
-                        }}
-                        title="Delete permanently"
-                        disabled={loadingStates[`permanent-${note._id}`]}
-                      >
-                        {loadingStates[`permanent-${note._id}`] ? (
-                          <LoadingSpinner
-                            size={14}
-                            inline={true}
-                            showMessage={false}
-                          />
-                        ) : (
-                          <Trash size={14} />
-                        )}
-                      </button>
-                    </>
-                  ) : (
-                    /* For active notes - show delete and pin */
-                    <>
-                      <button
-                        className="note-action-btn delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction(
-                            () => onDeleteNote(note._id),
-                            `delete-${note._id}`
-                          );
-                        }}
-                        title="Delete note"
-                        disabled={loadingStates[`delete-${note._id}`]}
-                      >
-                        {loadingStates[`delete-${note._id}`] ? (
-                          <LoadingSpinner
-                            size={14}
-                            inline={true}
-                            showMessage={false}
-                          />
-                        ) : (
-                          <Trash2 size={14} />
-                        )}
-                      </button>
-                      <button
-                        className={`note-action-btn pin-btn ${
-                          note.isPinned ? "active" : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction(
-                            () => onTogglePin(note._id),
-                            `pin-${note._id}`
-                          );
-                        }}
-                        title={note.isPinned ? "Unpin note" : "Pin note"}
-                        disabled={loadingStates[`pin-${note._id}`]}
-                      >
-                        {loadingStates[`pin-${note._id}`] ? (
-                          <LoadingSpinner
-                            size={14}
-                            inline={true}
-                            showMessage={false}
-                          />
-                        ) : (
-                          <Pin size={14} />
-                        )}
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+            <span className="section-count">{notes.length}</span>
+          </div>
 
-      <div className="sidebar-footer">
-        <div
-          className={`footer-item ${currentView === "pinned" ? "active" : ""}`}
-          onClick={handlePinnedClick}
-        >
-          <Pin size={16} />
-          <span>Pinned</span>
-          <span className="footer-count">({pinnedCount})</span>
-        </div>
-        <div
-          className={`footer-item ${
-            currentView === "deleted" ? "active" : ""
-          } ${isDeletePermanentlyMode ? "delete-all-mode" : ""}`}
-          onClick={handleDeletedClick}
-          title={
-            isDeletePermanentlyMode
-              ? "Delete all permanently"
-              : "View deleted notes"
-          }
-        >
-          <Trash2 size={16} />
-          <span>
-            {isDeletePermanentlyMode ? "Delete Permanently" : "Deleted"}
-          </span>
-          <span className="footer-count">({deletedCount})</span>
+          <div className="notes-list">
+            {notes.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <FileX2 size={32} />
+                </div>
+                <p className="empty-text">
+                  {currentView === "pinned"
+                    ? "No pinned notes"
+                    : currentView === "deleted"
+                    ? "No deleted notes"
+                    : searchTerm
+                    ? "No notes found"
+                    : "No notes yet"}
+                </p>
+                {currentView === "notes" && !searchTerm && (
+                  <button
+                    className="create-first-note-btn"
+                    onClick={onCreateNote}
+                  >
+                    Create your first note
+                  </button>
+                )}
+              </div>
+            ) : (
+              notes.map((note, index) => (
+                <div
+                  key={note._id}
+                  className={`note-item ${
+                    selectedNote?._id === note._id ? "selected" : ""
+                  } ${index === selectedIndex ? "keyboard-selected" : ""}`}
+                  style={{ "--item-index": index }}
+                  onClick={() => {
+                    onSelectNote(note);
+                    setSelectedIndex(index);
+                  }}
+                >
+                  <div className="note-content">
+                    <h4 className="note-title">{note.title || "Untitled"}</h4>
+                    <p className="note-preview">
+                      {getPreview(note.content) || "No additional text"}
+                    </p>
+                    <div className="note-meta">
+                      <span className="note-date">
+                        {formatDate(note.updatedAt)}
+                      </span>
+                      {note.isPinned && !note.isDeleted && (
+                        <Pin size={12} className="note-pin-indicator" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="note-actions">
+                    {note.isDeleted ? (
+                      <>
+                        <button
+                          className="note-action-btn restore"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAction(
+                              () => onRestoreNote(note._id),
+                              `restore-${note._id}`
+                            );
+                          }}
+                          title="Restore note"
+                          disabled={loadingStates[`restore-${note._id}`]}
+                        >
+                          {loadingStates[`restore-${note._id}`] ? (
+                            <LoadingSpinner
+                              size={12}
+                              inline={true}
+                              showMessage={false}
+                            />
+                          ) : (
+                            <RotateCcw size={12} />
+                          )}
+                        </button>
+                        <button
+                          className="note-action-btn permanent-delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePermanentDelete(note._id, e);
+                          }}
+                          title="Delete permanently"
+                          disabled={loadingStates[`permanent-${note._id}`]}
+                        >
+                          {loadingStates[`permanent-${note._id}`] ? (
+                            <LoadingSpinner
+                              size={12}
+                              inline={true}
+                              showMessage={false}
+                            />
+                          ) : (
+                            <Trash size={12} />
+                          )}
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className={`note-action-btn pin ${
+                            note.isPinned ? "active" : ""
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAction(
+                              () => onTogglePin(note._id),
+                              `pin-${note._id}`
+                            );
+                          }}
+                          title={note.isPinned ? "Unpin note" : "Pin note"}
+                          disabled={loadingStates[`pin-${note._id}`]}
+                        >
+                          {loadingStates[`pin-${note._id}`] ? (
+                            <LoadingSpinner
+                              size={12}
+                              inline={true}
+                              showMessage={false}
+                            />
+                          ) : (
+                            <Pin size={12} />
+                          )}
+                        </button>
+                        <button
+                          className="note-action-btn delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAction(
+                              () => onDeleteNote(note._id),
+                              `delete-${note._id}`
+                            );
+                          }}
+                          title="Delete note"
+                          disabled={loadingStates[`delete-${note._id}`]}
+                        >
+                          {loadingStates[`delete-${note._id}`] ? (
+                            <LoadingSpinner
+                              size={12}
+                              inline={true}
+                              showMessage={false}
+                            />
+                          ) : (
+                            <Trash2 size={12} />
+                          )}
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 

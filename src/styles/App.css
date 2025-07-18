@@ -1,8 +1,9 @@
 .app {
   display: flex;
   height: 100vh;
-  background-color: var(--bg-primary);
+  background-color: #0a0a0a;
   color: var(--text-primary);
+  overflow: hidden;
 }
 
 .app-loading {
@@ -11,5 +12,10 @@
   justify-content: center;
   width: 100%;
   height: 100vh;
-  background-color: var(--bg-primary);
+  background-color: #0a0a0a;
+}
+
+/* Smooth transitions for layout changes */
+.app * {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }

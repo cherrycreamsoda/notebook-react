@@ -1,9 +1,15 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { FileText, Plus } from "lucide-react";
+import { FileText, Plus, PanelLeftOpen } from "lucide-react";
 import "../styles/MainContent.css";
 
-const MainContent = ({ selectedNote, onUpdateNote, onCreateNote }) => {
+const MainContent = ({
+  selectedNote,
+  onUpdateNote,
+  onCreateNote,
+  sidebarCollapsed,
+  onToggleSidebar,
+}) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -45,7 +51,7 @@ const MainContent = ({ selectedNote, onUpdateNote, onCreateNote }) => {
       } finally {
         setIsSaving(false);
       }
-    }, 500); // Wait 500ms after user stops typing
+    }, 500);
   };
 
   const handleTitleChange = (e) => {
@@ -71,49 +77,81 @@ const MainContent = ({ selectedNote, onUpdateNote, onCreateNote }) => {
 
   if (!selectedNote) {
     return (
-      <div className="main-content">
-        <div className="empty-main">
-          <div className="empty-main-icon">
-            <FileText size={64} />
+      <div
+        className={`main-content ${
+          sidebarCollapsed ? "sidebar-collapsed" : ""
+        }`}
+      >
+        <div className="main-header">
+          {sidebarCollapsed && (
+            <button
+              className="sidebar-toggle-btn-main"
+              onClick={onToggleSidebar}
+              title="Expand Sidebar"
+            >
+              <PanelLeftOpen size={16} />
+            </button>
+          )}
+        </div>
+        <div className="main-content-inner">
+          <div className="empty-main">
+            <div className="empty-main-icon">
+              <FileText size={64} />
+            </div>
+            <h2 className="empty-main-title">What can I help you write?</h2>
+            <p className="empty-main-subtitle">
+              Select a note from the sidebar or create a new one to get started
+            </p>
+            <button className="create-new-note-btn" onClick={onCreateNote}>
+              <Plus size={16} />
+              Create New Note
+            </button>
           </div>
-          <h2 className="empty-main-title">Select a note to start writing</h2>
-          <p className="empty-main-subtitle">
-            Choose a note from the sidebar or create a new one
-          </p>
-          <button className="create-new-note-btn" onClick={onCreateNote}>
-            <Plus size={16} />
-            Create New Note
-          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="main-content">
-      <div className="note-editor">
-        <div className="note-header">
-          <input
-            ref={titleInputRef}
-            type="text"
-            value={title}
-            onChange={handleTitleChange}
-            placeholder="Note title..."
-            className="note-title-input"
+    <div
+      className={`main-content ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+    >
+      <div className="main-header">
+        {sidebarCollapsed && (
+          <button
+            className="sidebar-toggle-btn-main"
+            onClick={onToggleSidebar}
+            title="Expand Sidebar"
+          >
+            <PanelLeftOpen size={16} />
+          </button>
+        )}
+      </div>
+      <div className="main-content-inner">
+        <div className="note-editor">
+          <div className="note-header">
+            <input
+              ref={titleInputRef}
+              type="text"
+              value={title}
+              onChange={handleTitleChange}
+              placeholder="Untitled"
+              className="note-title-input"
+            />
+            {isSaving && (
+              <div className="saving-indicator">
+                <div className="saving-dot"></div>
+                <span>Saving...</span>
+              </div>
+            )}
+          </div>
+          <textarea
+            value={content}
+            onChange={handleContentChange}
+            placeholder="Start writing your note..."
+            className="note-content-input"
           />
-          {isSaving && (
-            <div className="saving-indicator">
-              <div className="saving-dot"></div>
-              <span>Saving</span>
-            </div>
-          )}
         </div>
-        <textarea
-          value={content}
-          onChange={handleContentChange}
-          placeholder="Start writing..."
-          className="note-content-input"
-        />
       </div>
     </div>
   );

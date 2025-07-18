@@ -1,8 +1,54 @@
 .main-content {
   flex: 1;
-  background-color: var(--bg-primary);
+  background-color: #0a0a0a;
   display: flex;
   flex-direction: column;
+  position: relative;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  /* Always show the window */
+  margin: 8px;
+  border-radius: 12px;
+  background-color: #181818;
+  border: 1px solid #2a2a2a;
+  overflow: hidden;
+}
+
+.main-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+}
+
+.sidebar-toggle-btn-main {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+}
+
+.sidebar-toggle-btn-main:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.main-content-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .empty-main {
@@ -12,46 +58,59 @@
   justify-content: center;
   height: 100%;
   text-align: center;
-  padding: 40px;
+  padding: 60px 40px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(245, 158, 11, 0.05) 0%,
+    transparent 70%
+  );
 }
 
 .empty-main-icon {
-  color: var(--text-tertiary);
+  color: #404040;
   margin-bottom: 24px;
+  opacity: 0.6;
 }
 
 .empty-main-title {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #ffffff;
   margin-bottom: 12px;
+  background: linear-gradient(135deg, #ffffff, #9ca3af);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .empty-main-subtitle {
   font-size: 16px;
-  color: var(--text-secondary);
+  color: #6b7280;
   margin-bottom: 32px;
-  line-height: 1.4;
+  line-height: 1.5;
+  max-width: 400px;
 }
 
 .create-new-note-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 24px 14px 24px;
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-primary);
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .create-new-note-btn:hover {
-  background-color: var(--hover-bg);
-  border-color: var(--text-tertiary);
+  background: linear-gradient(135deg, #d97706, #b45309);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
 }
 
 .note-editor {
@@ -59,13 +118,19 @@
   display: flex;
   flex-direction: column;
   padding: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .note-header {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .note-title-input {
@@ -73,15 +138,21 @@
   border: none;
   outline: none;
   background: none;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #ffffff;
   padding: 0;
   line-height: 1.2;
+  font-family: inherit;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .note-title-input::placeholder {
-  color: var(--text-tertiary);
+  color: #404040;
+}
+
+.note-title-input:focus::placeholder {
+  color: #4b5563;
 }
 
 .note-content-input {
@@ -90,21 +161,27 @@
   outline: none;
   background: none;
   font-size: 16px;
-  color: var(--text-primary);
-  line-height: 1.6;
+  color: #e5e7eb;
+  line-height: 1.7;
   resize: none;
   font-family: inherit;
+  padding: 0;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .note-content-input::placeholder {
-  color: var(--text-tertiary);
+  color: #4b5563;
+}
+
+.note-content-input:focus::placeholder {
+  color: #6b7280;
 }
 
 .saving-indicator {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-tertiary);
+  color: #6b7280;
   font-size: 12px;
   margin-left: auto;
   opacity: 0.8;
@@ -113,7 +190,7 @@
 .saving-dot {
   width: 6px;
   height: 6px;
-  background-color: var(--text-tertiary);
+  background-color: #f59e0b;
   border-radius: 50%;
   animation: pulse 1.5s ease-in-out infinite;
 }
@@ -127,5 +204,47 @@
   50% {
     opacity: 1;
     transform: scale(1.2);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin: 8px;
+    border-radius: 8px;
+  }
+
+  .note-editor {
+    padding: 20px;
+  }
+
+  .note-title-input {
+    font-size: 24px;
+  }
+
+  .empty-main {
+    padding: 40px 20px;
+  }
+
+  .empty-main-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .note-editor {
+    padding: 16px;
+  }
+
+  .note-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .note-title-input {
+    font-size: 20px;
+  }
+
+  .note-content-input {
+    font-size: 15px;
   }
 }
