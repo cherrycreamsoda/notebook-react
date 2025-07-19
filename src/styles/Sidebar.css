@@ -1,5 +1,5 @@
 .sidebar {
-  background-color: #0a0a0a;
+  background-color: transparent;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -487,8 +487,7 @@
 }
 
 .note-action-btn.pin.active {
-  color: #e5e5e5;
-  background-color: rgba(229, 229, 229, 0.2);
+  color: #fffb00;
 }
 
 .note-action-btn.delete:hover {
@@ -496,7 +495,8 @@
   background-color: #991b1b;
 }
 .note-action-btn.pin:hover {
-  color: #e5e5e5;
+  color: #fffb00;
+  background: transparent;
 }
 
 .note-action-btn.restore:hover {
@@ -504,8 +504,8 @@
 }
 
 .note-action-btn.permanent-delete:hover {
-  color: #991b1b;
-  background-color: #f03b3b;
+  color: #ff8989;
+  background-color: #7c0b0b;
 }
 
 /* Animations */

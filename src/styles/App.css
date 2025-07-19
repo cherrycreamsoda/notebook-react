@@ -24,8 +24,8 @@
   height: 44px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 20px;
+  gap: 8px;
+  padding: 2px 8px 0 8px;
   z-index: 100;
   background: transparent;
 }
@@ -86,8 +86,8 @@
 
 /* User Icon */
 .user-icon {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: linear-gradient(135deg, #e5e5e5, #cccccc);
   display: flex;
