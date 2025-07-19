@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import { User } from "lucide-react";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { User, Sun, Moon } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import MainContent from "./components/MainContent";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -9,13 +9,14 @@ import ErrorMessage from "./components/ErrorMessage";
 import { notesAPI, checkBackendHealth } from "./services/api";
 import "./styles/App.css";
 
-function App() {
+// Inner component that uses the theme context
+function AppContent() {
   // State management
   const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentView, setCurrentView] = useState("notes"); // "notes", "pinned", "deleted"
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   // Loading and error states
   const [initialLoading, setInitialLoading] = useState(true);
@@ -256,6 +257,9 @@ function App() {
   };
 
   // Calculate the counts from allNotesForCounts
+  const activeNotesCount = allNotesForCounts.filter(
+    (note) => !note.isDeleted
+  ).length;
   const pinnedCount = allNotesForCounts.filter(
     (note) => note.isPinned && !note.isDeleted
   ).length;
@@ -266,68 +270,97 @@ function App() {
   // Show loading spinner while connecting
   if (initialLoading) {
     return (
-      <ThemeProvider>
-        <div className="app">
-          <div className="app-loading">
-            <LoadingSpinner message="Connecting to server..." size={32} />
-          </div>
+      <div className="app">
+        <div className="app-loading">
+          <LoadingSpinner message="Connecting to server..." size={32} />
         </div>
-      </ThemeProvider>
+      </div>
     );
   }
 
   return (
-    <ThemeProvider>
-      <div className="app">
-        {/* Top Bar with Toggle and User Icon */}
-        <div className="top-bar">
-          <div
-            className={`toggle-switch ${toggleActive ? "active" : "inactive"}`}
-            onClick={() => setToggleActive(!toggleActive)}
-          >
-            <div className="toggle-switch-slider"></div>
-          </div>
-          <div className="user-icon">
-            <User size={18} />
-          </div>
-        </div>
+    <div className="app">
+      {/* Top Bar with Dark Mode, Toggle and User Icon */}
+      <TopBar toggleActive={toggleActive} setToggleActive={setToggleActive} />
 
-        {error && (
-          <ErrorMessage
-            message={error}
-            onDismiss={() => setError(null)}
-            onRetry={loadNotes}
-          />
-        )}
-
-        <Sidebar
-          notes={notes}
-          selectedNote={selectedNote}
-          onSelectNote={setSelectedNote}
-          onCreateNote={createNote}
-          onDeleteNote={deleteNote}
-          onPermanentDelete={permanentDelete}
-          onRestoreNote={restoreNote}
-          onTogglePin={togglePin}
-          onClearAllDeleted={clearAllDeleted}
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-          currentView={currentView}
-          onViewChange={handleViewChange}
-          pinnedCount={pinnedCount}
-          deletedCount={deletedCount}
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      {error && (
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+          onRetry={loadNotes}
         />
+      )}
 
-        <MainContent
-          selectedNote={selectedNote}
-          onUpdateNote={updateNote}
-          onCreateNote={createNote}
-          sidebarCollapsed={sidebarCollapsed}
-          onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
+      <Sidebar
+        notes={notes}
+        selectedNote={selectedNote}
+        onSelectNote={setSelectedNote}
+        onCreateNote={createNote}
+        onDeleteNote={deleteNote}
+        onPermanentDelete={permanentDelete}
+        onRestoreNote={restoreNote}
+        onTogglePin={togglePin}
+        onClearAllDeleted={clearAllDeleted}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        currentView={currentView}
+        onViewChange={handleViewChange}
+        pinnedCount={pinnedCount}
+        deletedCount={deletedCount}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        activeNotesCount={activeNotesCount}
+      />
+
+      <MainContent
+        selectedNote={selectedNote}
+        onUpdateNote={updateNote}
+        onCreateNote={createNote}
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
+    </div>
+  );
+}
+
+// Separate TopBar component that uses theme context
+function TopBar({ toggleActive, setToggleActive }) {
+  return (
+    <div className="top-bar">
+      <ThemeToggleButton />
+      <div
+        className={`toggle-switch ${toggleActive ? "active" : "inactive"}`}
+        onClick={() => setToggleActive(!toggleActive)}
+      >
+        <div className="toggle-switch-slider"></div>
       </div>
+      <div className="user-icon">
+        <User size={18} />
+      </div>
+    </div>
+  );
+}
+
+// Separate component for theme toggle that uses the theme context
+function ThemeToggleButton() {
+  const { isDark, toggleTheme } = useTheme();
+
+  return (
+    <button
+      className="theme-toggle-btn"
+      onClick={toggleTheme}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+    >
+      {isDark ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
+  );
+}
+
+// Main App component that provides the theme context
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
     </ThemeProvider>
   );
 }

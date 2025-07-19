@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { FileText, Plus, PanelLeftOpen } from "lucide-react";
+import { FileText, Plus, PanelLeftOpen, PanelLeftClose } from "lucide-react";
 import "../styles/MainContent.css";
 
 const MainContent = ({
@@ -83,15 +83,17 @@ const MainContent = ({
         }`}
       >
         <div className="main-header">
-          {sidebarCollapsed && (
-            <button
-              className="sidebar-toggle-btn-main"
-              onClick={onToggleSidebar}
-              title="Expand Sidebar"
-            >
+          <button
+            className="sidebar-toggle-btn-main"
+            onClick={onToggleSidebar}
+            title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {sidebarCollapsed ? (
               <PanelLeftOpen size={16} />
-            </button>
-          )}
+            ) : (
+              <PanelLeftClose size={16} />
+            )}
+          </button>
         </div>
         <div className="main-content-inner">
           <div className="empty-main">
@@ -117,15 +119,17 @@ const MainContent = ({
       className={`main-content ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
     >
       <div className="main-header">
-        {sidebarCollapsed && (
-          <button
-            className="sidebar-toggle-btn-main"
-            onClick={onToggleSidebar}
-            title="Expand Sidebar"
-          >
+        <button
+          className="sidebar-toggle-btn-main"
+          onClick={onToggleSidebar}
+          title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          {sidebarCollapsed ? (
             <PanelLeftOpen size={16} />
-          </button>
-        )}
+          ) : (
+            <PanelLeftClose size={16} />
+          )}
+        </button>
       </div>
       <div className="main-content-inner">
         <div className="note-editor">

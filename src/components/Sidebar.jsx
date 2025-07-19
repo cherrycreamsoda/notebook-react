@@ -1,8 +1,5 @@
 import React from "react";
-import { useTheme } from "../contexts/ThemeContext";
 import {
-  Sun,
-  Moon,
   Plus,
   Search,
   Pin,
@@ -13,7 +10,6 @@ import {
   RotateCcw,
   Trash,
   StickyNote,
-  PanelLeftClose,
   Github,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
@@ -39,8 +35,8 @@ const Sidebar = ({
   deletedCount,
   collapsed,
   onToggleCollapse,
+  activeNotesCount,
 }) => {
-  const { isDark, toggleTheme } = useTheme();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [loadingStates, setLoadingStates] = useState({});
   const [confirmDialog, setConfirmDialog] = useState(null);
@@ -131,15 +127,19 @@ const Sidebar = ({
   }, [confirmDialog]);
 
   const formatDate = (date) => {
-    const now = new Date();
     const noteDate = new Date(date);
-    const diffTime = Math.abs(now - noteDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const day = String(noteDate.getDate()).padStart(2, "0");
+    const month = String(noteDate.getMonth() + 1).padStart(2, "0");
+    const year = noteDate.getFullYear();
 
-    if (diffDays === 1) return "Today";
-    if (diffDays === 2) return "Yesterday";
-    if (diffDays <= 7) return `${diffDays} days ago`;
-    return noteDate.toLocaleDateString();
+    let hours = noteDate.getHours();
+    const minutes = String(noteDate.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 should be 12
+    const formattedHours = String(hours).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${formattedHours}:${minutes} ${ampm}`;
   };
 
   const getPreview = (content) => {
@@ -268,20 +268,6 @@ const Sidebar = ({
               <Plus size={16} />
             )}
           </button>
-          <button
-            className="header-action-btn"
-            onClick={toggleTheme}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          <button
-            className="sidebar-toggle-btn"
-            onClick={onToggleCollapse}
-            title="Collapse Sidebar"
-          >
-            <PanelLeftClose size={16} />
-          </button>
         </div>
       </div>
 
@@ -317,7 +303,7 @@ const Sidebar = ({
             >
               <StickyNote size={16} />
               <span>All Notes</span>
-              <span className="nav-count">{notes.length}</span>
+              <span className="nav-count">{activeNotesCount}</span>
             </button>
 
             <button
@@ -410,9 +396,6 @@ const Sidebar = ({
                       <span className="note-date">
                         {formatDate(note.updatedAt)}
                       </span>
-                      {note.isPinned && !note.isDeleted && (
-                        <Pin size={12} className="note-pin-indicator" />
-                      )}
                     </div>
                   </div>
                   <div className="note-actions">

@@ -131,7 +131,7 @@
 /* Search */
 .search-container {
   padding: 0px 8px 16px 8px;
-  animation: slideInFromLeft 0.4s ease-out 0.1s both;
+  animation: slideInFromLeft 0.4s ease-out;
 }
 
 .search-input-wrapper {
@@ -192,7 +192,7 @@
 /* Navigation */
 .sidebar-nav {
   padding: 0 8px 16px 8px;
-  animation: slideInFromLeft 0.4s ease-out 0.2s both;
+  animation: slideInFromLeft 0.4s ease-out 0.1s both;
 }
 
 .nav-section {
@@ -487,16 +487,39 @@
 }
 
 .note-action-btn.pin.active {
+  color: #fbbf24 !important;
+  background-color: rgba(251, 191, 36, 0.1) !important;
+}
+
+.note-action-btn.pin.active:hover {
+  color: #f59e0b !important;
+  background-color: rgba(251, 191, 36, 0.2) !important;
+}
+
+/* Ensure pinned state overrides all other states */
+.note-item .note-action-btn.pin.active {
+  color: #fbbf24 !important;
+  background-color: rgba(251, 191, 36, 0.1) !important;
+}
+
+.note-item:hover .note-action-btn.pin.active {
+  color: #fbbf24 !important;
+  background-color: rgba(251, 191, 36, 0.15) !important;
+}
+
+.note-item.selected .note-action-btn.pin.active {
+  color: #fbbf24 !important;
+  background-color: rgba(251, 191, 36, 0.15) !important;
+}
+
+.note-action-btn.pin:hover {
   color: #fffb00;
+  background: rgba(251, 191, 36, 0.15);
 }
 
 .note-action-btn.delete:hover {
-  color: #f03b3b;
-  background-color: #991b1b;
-}
-.note-action-btn.pin:hover {
-  color: #fffb00;
-  background: transparent;
+  color: #991b1b;
+  background: #f36e6e;
 }
 
 .note-action-btn.restore:hover {

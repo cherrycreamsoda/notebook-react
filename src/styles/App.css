@@ -30,6 +30,27 @@
   background: transparent;
 }
 
+/* Theme Toggle Button in Top Bar */
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  width: 30px;
+  height: 30px;
+}
+
+.theme-toggle-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 /* Beautiful Toggle Switch */
 .toggle-switch {
   position: relative;
@@ -86,6 +107,7 @@
 
 /* User Icon */
 .user-icon {
+  margin: 0 3px 0 4px;
   width: 30px;
   height: 30px;
   border-radius: 50%;
