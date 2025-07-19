@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { User } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import MainContent from "./components/MainContent";
 import LoadingSpinner from "./components/LoadingSpinner";
@@ -23,6 +24,9 @@ function App() {
 
   // State for maintaining all notes for counts
   const [allNotesForCounts, setAllNotesForCounts] = useState([]);
+
+  // Toggle switch state
+  const [toggleActive, setToggleActive] = useState(true);
 
   // Check backend connection on app start
   useEffect(() => {
@@ -275,6 +279,19 @@ function App() {
   return (
     <ThemeProvider>
       <div className="app">
+        {/* Top Bar with Toggle and User Icon */}
+        <div className="top-bar">
+          <div
+            className={`toggle-switch ${toggleActive ? "active" : "inactive"}`}
+            onClick={() => setToggleActive(!toggleActive)}
+          >
+            <div className="toggle-switch-slider"></div>
+          </div>
+          <div className="user-icon">
+            <User size={18} />
+          </div>
+        </div>
+
         {error && (
           <ErrorMessage
             message={error}

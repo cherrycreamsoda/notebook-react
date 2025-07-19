@@ -33,9 +33,9 @@ body {
   --border-color: #2a2a2a;
   --border-light: #404040;
   --hover-bg: #2a2a2a;
-  --selected-bg: #d97706;
-  --selected-text: #ffffff;
-  --accent-yellow: #f59e0b;
+  --selected-bg: #e5e5e5;
+  --selected-text: #000000;
+  --accent-white: #e5e5e5;
   --accent-green: #10b981;
   --accent-red: #ef4444;
 }
@@ -75,18 +75,18 @@ body {
 }
 
 *:focus-visible {
-  outline: 2px solid #f59e0b;
+  outline: 2px solid #e5e5e5;
   outline-offset: 2px;
 }
 
 /* Selection styles */
 ::selection {
-  background-color: rgba(245, 158, 11, 0.3);
+  background-color: rgba(229, 229, 229, 0.3);
   color: #ffffff;
 }
 
 ::-moz-selection {
-  background-color: rgba(245, 158, 11, 0.3);
+  background-color: rgba(229, 229, 229, 0.3);
   color: #ffffff;
 }
 

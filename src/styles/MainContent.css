@@ -6,7 +6,7 @@
   position: relative;
   transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
   /* Always show the window */
-  margin: 8px;
+  margin: 44px 8px 8px 8px;
   border-radius: 12px;
   background-color: #181818;
   border: 1px solid #2a2a2a;
@@ -16,12 +16,31 @@
 .main-header {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #f2a013, #cd7006);
+  padding: 16px 20px;
+  background: linear-gradient(
+    135deg,
+    #14efff,
+    #2be262,
+    #89dc14,
+    #ff2356,
+    #8a2be2
+  );
+  background-size: 300% 300%;
+  animation: gradientMove 16s ease-in-out infinite;
   border-bottom: 2px solid #0a0a0a;
-  height: 48px;
-  min-height: 48px;
-  max-height: 48px;
+  height: 64px;
+  min-height: 64px;
+  max-height: 64px;
+}
+
+@keyframes gradientMove {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .sidebar-toggle-btn-main {
@@ -96,21 +115,21 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #e5e5e5, #cccccc);
   border: none;
   border-radius: 6px;
-  color: #ffffff;
+  color: #000000;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 12px rgba(229, 229, 229, 0.3);
 }
 
 .create-new-note-btn:hover {
-  background: linear-gradient(135deg, #d97706, #b45309);
+  background: linear-gradient(135deg, #cccccc, #b3b3b3);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 6px 16px rgba(229, 229, 229, 0.4);
 }
 
 .note-editor {
@@ -190,7 +209,7 @@
 .saving-dot {
   width: 6px;
   height: 6px;
-  background-color: #f59e0b;
+  background-color: #e5e5e5;
   border-radius: 50%;
   animation: pulse 1.5s ease-in-out infinite;
 }
@@ -209,7 +228,7 @@
 
 @media (max-width: 768px) {
   .main-content {
-    margin: 8px;
+    margin: 44px 8px 8px 8px;
     border-radius: 8px;
   }
 

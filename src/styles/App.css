@@ -4,6 +4,7 @@
   background-color: #0a0a0a;
   color: var(--text-primary);
   overflow: hidden;
+  position: relative;
 }
 
 .app-loading {
@@ -13,6 +14,95 @@
   width: 100%;
   height: 100vh;
   background-color: #0a0a0a;
+}
+
+/* Top Bar */
+.top-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  z-index: 100;
+  background: transparent;
+}
+
+/* Beautiful Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 28px;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  overflow: hidden;
+}
+
+.toggle-switch.active {
+  background: linear-gradient(
+    135deg,
+    #14efff,
+    #2be262,
+    #89dc14,
+    #ff2356,
+    #8a2be2
+  );
+  background-size: 300% 300%;
+  animation: gradientMove 20s infinite;
+  box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+}
+
+.toggle-switch.inactive {
+  background: linear-gradient(135deg, #e5e5e5, #cccccc);
+  border-color: #0a0a0a;
+}
+
+.toggle-switch-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch.active .toggle-switch-slider {
+  transform: translateX(32px);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch.inactive .toggle-switch-slider {
+  transform: translateX(0);
+  background: #0a0a0a;
+}
+
+/* User Icon */
+.user-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e5e5e5, #cccccc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.user-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(229, 229, 229, 0.4);
+  border-color: #e5e5e5;
 }
 
 /* Smooth transitions for layout changes */

@@ -47,6 +47,7 @@
 .sidebar-header-actions {
   display: flex;
   gap: 8px;
+  order: -1; /* Move to the left */
 }
 
 .header-action-btn,
@@ -71,6 +72,21 @@
   color: #ffffff;
 }
 
+/* Special styling for the plus button */
+.header-action-btn:first-child {
+  width: 40px;
+  height: 40px;
+  background: #e5e5e5;
+  color: #000000;
+  padding: 10px;
+}
+
+.header-action-btn:first-child:hover {
+  background-color: #cccccc;
+  color: #000000;
+  transform: scale(1.05);
+}
+
 /* Collapsed Sidebar */
 .sidebar-toggle-collapsed {
   padding: 16px 0px 0px 7px;
@@ -79,23 +95,29 @@
 }
 
 .github-btn {
-  width: 44px;
-  height: 32px;
-  background-color: #2a2a2a;
-  border: none;
-  border-radius: 6px;
-  color: #9ca3af;
+  width: 48px;
+  height: 48px;
+  background-color: transparent;
+  border-radius: 8px;
+  color: #808080;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  padding: 4px 3px 4px 4px;
+  transition: all 0.3s ease;
+  padding: 8px;
 }
 
 .github-btn:hover {
-  background-color: #404040;
-  color: #ffffff;
+  border-color: #e5e5e5;
+  color: #e5e5e5;
+  transform: scale(1.05);
+}
+
+.github-btn svg {
+  stroke-width: 2.5px;
+  width: 24px;
+  height: 24px;
 }
 
 /* Sidebar Content */
@@ -108,7 +130,7 @@
 
 /* Search */
 .search-container {
-  padding: 8px 8px 16px 8px;
+  padding: 0px 8px 16px 8px;
   animation: slideInFromLeft 0.4s ease-out 0.1s both;
 }
 
@@ -202,9 +224,9 @@
 }
 
 .nav-item.active {
-  background-color: #d97706;
-  color: #ffffff;
-  border-color: #f59e0b;
+  background-color: #e5e5e5;
+  color: #000000;
+  border-color: #ffffff;
 }
 
 .nav-item.delete-mode {
@@ -221,7 +243,7 @@
 .nav-count {
   margin-left: auto;
   font-size: 12px;
-  color: #6b7280;
+  color: #e5e5e5;
   background-color: #404040;
   padding: 2px 8px;
   border-radius: 6px;
@@ -230,8 +252,8 @@
 }
 
 .nav-item.active .nav-count {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #000000;
 }
 
 .nav-item.delete-mode .nav-count {
@@ -361,12 +383,12 @@
 
 .note-item:hover {
   background-color: #181818;
-  border-color: #404040;
+  border-color: #181818;
 }
 
 .note-item.selected {
   background-color: #181818;
-  border-color: #181818;
+  border-color: #404040;
 }
 
 .note-item.keyboard-selected {
@@ -423,11 +445,11 @@
 }
 
 .note-pin-indicator {
-  color: #f59e0b;
+  color: #e5e5e5;
 }
 
 .note-item.selected .note-pin-indicator {
-  color: #fbbf24;
+  color: #ffffff;
 }
 
 /* Note Actions */
@@ -465,16 +487,16 @@
 }
 
 .note-action-btn.pin.active {
-  color: #f59e0b;
-  background-color: rgba(245, 158, 11, 0.2);
+  color: #e5e5e5;
+  background-color: rgba(229, 229, 229, 0.2);
 }
 
 .note-action-btn.delete:hover {
-  color: #991b1b;
-  background-color: #f03b3b;
+  color: #f03b3b;
+  background-color: #991b1b;
 }
 .note-action-btn.pin:hover {
-  color: #f59e0b;
+  color: #e5e5e5;
 }
 
 .note-action-btn.restore:hover {
