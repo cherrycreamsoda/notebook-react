@@ -5,7 +5,6 @@
   height: 100vh;
   outline: none;
   position: relative;
-  z-index: 10;
   transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
@@ -17,6 +16,18 @@
 .sidebar-collapsed {
   width: 60px;
   min-width: 60px;
+}
+
+/* Glassmorphic background for overlay mode (fullscreen and mobile) */
+.app.fullscreen-mode .sidebar-expanded {
+  width: 100%;
+  position: absolute;
+  z-index: 1000;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
 /* Sidebar Header */
@@ -145,7 +156,6 @@
   left: 12px;
   color: #6b7280;
   pointer-events: none;
-  z-index: 1;
 }
 
 .search-input {
@@ -561,12 +571,15 @@
   background: #4b5563;
 }
 
-/* Responsive Design */
+/* Responsive Design - Tablet/Mobile behavior with glassmorphic background */
 @media (max-width: 768px) {
   .sidebar-expanded {
     width: 100%;
     position: absolute;
     z-index: 1000;
+    background: rgba(88, 88, 88, 0.066);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
   }
 
   .sidebar-collapsed {

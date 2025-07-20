@@ -4,7 +4,6 @@ import {
   Search,
   Pin,
   Trash2,
-  FileX2,
   X,
   ArrowLeft,
   RotateCcw,
@@ -40,11 +39,6 @@ const Sidebar = ({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [loadingStates, setLoadingStates] = useState({});
   const [confirmDialog, setConfirmDialog] = useState(null);
-  const [expandedSections, setExpandedSections] = useState({
-    notes: true,
-    pinned: true,
-    deleted: true,
-  });
   const searchInputRef = useRef(null);
   const sidebarRef = useRef(null);
 
@@ -224,13 +218,6 @@ const Sidebar = ({
     setConfirmDialog(null);
   };
 
-  const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
-
   const handleGithubClick = () => {
     window.open("https://github.com/cherrycreamsoda", "_blank");
   };
@@ -354,7 +341,7 @@ const Sidebar = ({
             {notes.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">
-                  <FileX2 size={32} />
+                  <StickyNote size={32} />
                 </div>
                 <p className="empty-text">
                   {currentView === "pinned"

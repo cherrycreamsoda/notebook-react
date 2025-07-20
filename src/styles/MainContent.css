@@ -13,9 +13,15 @@
   overflow: hidden;
 }
 
+/* Fullscreen mode - expand main content to fill space (both top and left) */
+.app.fullscreen-mode .main-content {
+  margin: 8px 8px 8px 8px;
+}
+
 .main-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 16px 20px;
   background: linear-gradient(
     135deg,
@@ -33,6 +39,12 @@
   max-height: 64px;
 }
 
+.header-left-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 @keyframes gradientMove {
   0%,
   100% {
@@ -44,22 +56,102 @@
 }
 
 .sidebar-toggle-btn-main {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
-  color: #ffffff;
+  color: black;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.5s ease;
   width: 32px;
   height: 32px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-toggle-btn-main:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: black;
+  color: white;
+}
+
+button {
+  background-color: white;
+  color: black;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+button:hover {
+  background-color: black;
+  color: white;
+}
+
+.note-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.note-header-btn {
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease;
+  width: 32px;
+  height: 32px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.note-header-btn:hover {
+  background-color: black;
+  color: white;
+}
+
+.note-header-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.note-header-btn.pin-btn.active {
+  color: #fbbf24;
+  background-color: black;
+}
+
+.note-header-btn.pin-btn:hover {
+  color: #fbbf24;
+}
+.note-header-btn.delete-btn {
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease;
+  width: 32px;
+  height: 32px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.note-header-btn.delete-btn:hover {
+  background-color: black;
+  color: rgb(197, 0, 0);
 }
 
 .main-content-inner {
@@ -78,58 +170,33 @@
   height: 100%;
   text-align: center;
   padding: 60px 40px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(245, 158, 11, 0.05) 0%,
-    transparent 70%
-  );
 }
 
-.empty-main-icon {
-  color: #404040;
-  margin-bottom: 24px;
-  opacity: 0.6;
-}
-
-.empty-main-title {
-  font-size: 32px;
-  font-weight: 600;
+.welcome-title {
+  font-size: 48px;
+  font-weight: 300;
   color: #ffffff;
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, #ffffff, #9ca3af);
+  margin: 0;
+  font-family: "Georgia", "Times New Roman", serif;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 50%, #9ca3af 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  animation: welcomeFadeIn 1.2s ease-out;
 }
 
-.empty-main-subtitle {
-  font-size: 16px;
-  color: #6b7280;
-  margin-bottom: 32px;
-  line-height: 1.5;
-  max-width: 400px;
-}
-
-.create-new-note-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #e5e5e5, #cccccc);
-  border: none;
-  border-radius: 6px;
-  color: #000000;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(229, 229, 229, 0.3);
-}
-
-.create-new-note-btn:hover {
-  background: linear-gradient(135deg, #cccccc, #b3b3b3);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(229, 229, 229, 0.4);
+@keyframes welcomeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .note-editor {
@@ -226,6 +293,29 @@
   }
 }
 
+.fullscreen-toggle-btn {
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease;
+  width: 32px;
+  height: 32px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fullscreen-toggle-btn:hover {
+  background-color: black;
+  color: white;
+}
+
 @media (max-width: 768px) {
   .main-content {
     margin: 44px 8px 8px 8px;
@@ -244,8 +334,8 @@
     padding: 40px 20px;
   }
 
-  .empty-main-title {
-    font-size: 24px;
+  .welcome-title {
+    font-size: 32px;
   }
 }
 
@@ -265,5 +355,9 @@
 
   .note-content-input {
     font-size: 15px;
+  }
+
+  .welcome-title {
+    font-size: 28px;
   }
 }

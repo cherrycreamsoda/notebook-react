@@ -5,18 +5,16 @@
 const API_BASE_URL =
   typeof process !== "undefined" && process.env && process.env.REACT_APP_API_URL
     ? process.env.REACT_APP_API_URL
-    : "http://localhost:5000/api";
+    : "http://localhost:5000/api"
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ error: "Network error" }));
-    throw new Error(error.error || `HTTP error! status: ${response.status}`);
+    const error = await response.json().catch(() => ({ error: "Network error" }))
+    throw new Error(error.error || `HTTP error! status: ${response.status}`)
   }
-  return response.json();
-};
+  return response.json()
+}
 
 // Helper function to make API calls
 const apiCall = async (endpoint, options = {}) => {
@@ -27,39 +25,33 @@ const apiCall = async (endpoint, options = {}) => {
         ...options.headers,
       },
       ...options,
-    });
-    return await handleResponse(response);
+    })
+    return await handleResponse(response)
   } catch (error) {
-    console.error(`API call failed for ${endpoint}:`, error);
-    throw error;
+    console.error(`API call failed for ${endpoint}:`, error)
+    throw error
   }
-};
+}
 
 // API functions that match your backend endpoints
 export const notesAPI = {
   // Get all notes with optional filtering
   getAllNotes: async (view = "", search = "") => {
-    const params = new URLSearchParams();
-    if (view) params.append("view", view);
-    if (search) params.append("search", search);
+    const params = new URLSearchParams()
+    if (view) params.append("view", view)
+    if (search) params.append("search", search)
 
-    const queryString = params.toString();
-    const endpoint = `/notes${queryString ? `?${queryString}` : ""}`;
+    const queryString = params.toString()
+    const endpoint = `/notes${queryString ? `?${queryString}` : ""}`
 
-    const result = await apiCall(endpoint);
-    return result.data; // Return just the notes array
+    const result = await apiCall(endpoint)
+    return result.data // Return just the notes array
   },
 
   // Get ALL notes including deleted ones (for counting)
   getAllNotesIncludingDeleted: async () => {
-    const result = await apiCall("/notes?includeAll=true");
-    return result.data;
-  },
-
-  // Get a specific note by ID
-  getNoteById: async (id) => {
-    const result = await apiCall(`/notes/${id}`);
-    return result.data;
+    const result = await apiCall("/notes?includeAll=true")
+    return result.data
   },
 
   // Create a new note
@@ -72,8 +64,8 @@ export const notesAPI = {
         isPinned: false,
         ...noteData,
       }),
-    });
-    return result.data;
+    })
+    return result.data
   },
 
   // Update a note
@@ -81,56 +73,50 @@ export const notesAPI = {
     const result = await apiCall(`/notes/${id}`, {
       method: "PUT",
       body: JSON.stringify(updates),
-    });
-    return result.data;
+    })
+    return result.data
   },
 
   // Toggle pin status
   togglePin: async (id) => {
     const result = await apiCall(`/notes/${id}/pin`, {
       method: "PUT",
-    });
-    return result.data;
+    })
+    return result.data
   },
 
   // Soft delete a note (move to trash)
   deleteNote: async (id) => {
     const result = await apiCall(`/notes/${id}`, {
       method: "DELETE",
-    });
-    return result.data;
+    })
+    return result.data
   },
 
   // Restore a deleted note
   restoreNote: async (id) => {
     const result = await apiCall(`/notes/${id}/restore`, {
       method: "PUT",
-    });
-    return result.data;
+    })
+    return result.data
   },
 
   // Permanently delete a note
   permanentDelete: async (id) => {
     const result = await apiCall(`/notes/${id}/permanent`, {
       method: "DELETE",
-    });
-    return result.data;
+    })
+    return result.data
   },
-
-  // Get notes statistics
-  getStats: async () => {
-    const result = await apiCall("/notes/stats/summary");
-    return result.data;
-  },
-};
+}
 
 // Export a function to check if the backend is running
 export const checkBackendHealth = async () => {
   try {
-    const healthUrl = API_BASE_URL.replace("/api", "") + "/api/health";
-    const response = await fetch(healthUrl);
-    return response.ok;
+    const healthUrl = API_BASE_URL.replace("/api", "") + "/api/health"
+    const response = await fetch(healthUrl)
+    return response.ok
   } catch (error) {
-    return false;
+    return false
   }
-};
+}

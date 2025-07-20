@@ -1,11 +1,13 @@
 import React from "react";
+("use client");
 import { useState, useEffect } from "react";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
-import { User, Sun, Moon } from "lucide-react";
+import { Sun, Moon, User } from "lucide-react";
 import Sidebar from "./components/Sidebar";
 import MainContent from "./components/MainContent";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ErrorMessage from "./components/ErrorMessage";
+import GlassmorphicFAB from "./components/GlassmorphicFAB";
 import { notesAPI, checkBackendHealth } from "./services/api";
 import "./styles/App.css";
 
@@ -17,6 +19,7 @@ function AppContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentView, setCurrentView] = useState("notes"); // "notes", "pinned", "deleted"
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Loading and error states
   const [initialLoading, setInitialLoading] = useState(true);
@@ -26,7 +29,7 @@ function AppContent() {
   // State for maintaining all notes for counts
   const [allNotesForCounts, setAllNotesForCounts] = useState([]);
 
-  // Toggle switch state
+  // Toggle switch state - for future use
   const [toggleActive, setToggleActive] = useState(true);
 
   // Check backend connection on app start
@@ -50,6 +53,13 @@ function AppContent() {
       loadNotes();
     }
   }, [currentView, searchTerm, backendConnected]);
+
+  // Handle fullscreen mode - collapse sidebar when entering fullscreen
+  useEffect(() => {
+    if (isFullscreen) {
+      setSidebarCollapsed(true);
+    }
+  }, [isFullscreen]);
 
   // Function to load all notes for counts
   const loadAllNotesForCounts = async () => {
@@ -256,6 +266,22 @@ function AppContent() {
     setSearchTerm(newSearchTerm);
   };
 
+  // Toggle fullscreen mode
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
+  // Handle sidebar toggle in fullscreen mode
+  const handleSidebarToggle = () => {
+    if (isFullscreen) {
+      // In fullscreen mode, sidebar acts as overlay
+      setSidebarCollapsed(!sidebarCollapsed);
+    } else {
+      // Normal mode
+      setSidebarCollapsed(!sidebarCollapsed);
+    }
+  };
+
   // Calculate the counts from allNotesForCounts
   const activeNotesCount = allNotesForCounts.filter(
     (note) => !note.isDeleted
@@ -279,7 +305,7 @@ function AppContent() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${isFullscreen ? "fullscreen-mode" : ""}`}>
       {/* Top Bar with Dark Mode, Toggle and User Icon */}
       <TopBar toggleActive={toggleActive} setToggleActive={setToggleActive} />
 
@@ -308,7 +334,7 @@ function AppContent() {
         pinnedCount={pinnedCount}
         deletedCount={deletedCount}
         collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onToggleCollapse={handleSidebarToggle}
         activeNotesCount={activeNotesCount}
       />
 
@@ -317,8 +343,15 @@ function AppContent() {
         onUpdateNote={updateNote}
         onCreateNote={createNote}
         sidebarCollapsed={sidebarCollapsed}
-        onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onToggleSidebar={handleSidebarToggle}
+        onTogglePin={togglePin}
+        onDeleteNote={deleteNote}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={toggleFullscreen}
       />
+
+      {/* Glassmorphic FAB */}
+      <GlassmorphicFAB onCreateNote={createNote} />
     </div>
   );
 }

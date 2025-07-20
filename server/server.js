@@ -1,9 +1,6 @@
 // This is the main server file - think of it as the "brain" of your backend
 const express = require("express")
-const mongoose = require("mongoose")
 const cors = require("cors")
-const helmet = require("helmet")
-const morgan = require("morgan")
 require("dotenv").config()
 
 // Import our routes (we'll create this next)
@@ -15,12 +12,6 @@ const PORT = process.env.PORT || 5000
 
 // MIDDLEWARE - these are like "helpers" that process requests before they reach your routes
 // Think of them as security guards and translators
-
-// Helmet - adds security headers (like a security guard for your API)
-app.use(helmet())
-
-// Morgan - logs all requests (like a visitor log book)
-app.use(morgan("combined"))
 
 // CORS - allows your React app to talk to this backend
 // Without this, your browser would block the connection
@@ -53,7 +44,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).json({
     error: "Something went wrong!",
-    message: process.env.NODE_ENV === "development" ? err.message : "Internal server error",
+    message: "Internal server error",
   })
 })
 
@@ -63,6 +54,7 @@ app.use("*", (req, res) => {
 })
 
 // DATABASE CONNECTION - Connect to MongoDB
+const mongoose = require("mongoose")
 mongoose
   .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/notebook", {
     useNewUrlParser: true,

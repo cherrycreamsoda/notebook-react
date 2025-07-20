@@ -26,8 +26,13 @@
   align-items: center;
   gap: 8px;
   padding: 2px 8px 0 8px;
-  z-index: 100;
   background: transparent;
+  transition: transform 0.3s ease;
+}
+
+/* Fullscreen mode - hide top bar */
+.app.fullscreen-mode .top-bar {
+  transform: translateY(-100%);
 }
 
 /* Theme Toggle Button in Top Bar */
@@ -105,6 +110,16 @@
   background: #0a0a0a;
 }
 
+@keyframes gradientMove {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 /* User Icon */
 .user-icon {
   margin: 0 3px 0 4px;
@@ -130,4 +145,17 @@
 /* Smooth transitions for layout changes */
 .app * {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fullscreen mode - sidebar behaves like tablet (overlay mode) */
+.app.fullscreen-mode .sidebar-expanded {
+  width: 100%;
+  position: absolute;
+  z-index: 1000;
+}
+
+.app.fullscreen-mode .sidebar-collapsed {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
 }
