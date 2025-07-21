@@ -10,6 +10,7 @@ import {
   Trash,
   StickyNote,
   Github,
+  PanelLeftClose,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import LoadingSpinner from "./LoadingSpinner";
@@ -35,6 +36,7 @@ const Sidebar = ({
   collapsed,
   onToggleCollapse,
   activeNotesCount,
+  isFullscreen, // Add this prop
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [loadingStates, setLoadingStates] = useState({});
@@ -255,6 +257,17 @@ const Sidebar = ({
               <Plus size={16} />
             )}
           </button>
+
+          {/* Add close button only in fullscreen mode */}
+          {isFullscreen && (
+            <button
+              className="header-action-btn sidebar-close-btn"
+              onClick={onToggleCollapse}
+              title="Close Sidebar"
+            >
+              <PanelLeftClose size={16} />
+            </button>
+          )}
         </div>
       </div>
 

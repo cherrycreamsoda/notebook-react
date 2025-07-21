@@ -21,6 +21,7 @@ const MainContent = ({
   onDeleteNote,
   isFullscreen,
   onToggleFullscreen,
+  isTransitioningFullscreen,
 }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -139,8 +140,15 @@ const MainContent = ({
               className="fullscreen-toggle-btn"
               onClick={onToggleFullscreen}
               title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+              disabled={isTransitioningFullscreen}
             >
-              {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+              {isTransitioningFullscreen ? (
+                <LoadingSpinner size={16} inline={true} showMessage={false} />
+              ) : isFullscreen ? (
+                <Minimize size={16} />
+              ) : (
+                <Maximize size={16} />
+              )}
             </button>
           </div>
         </div>
@@ -176,8 +184,15 @@ const MainContent = ({
             className="fullscreen-toggle-btn"
             onClick={onToggleFullscreen}
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+            disabled={isTransitioningFullscreen}
           >
-            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+            {isTransitioningFullscreen ? (
+              <LoadingSpinner size={16} inline={true} showMessage={false} />
+            ) : isFullscreen ? (
+              <Minimize size={16} />
+            ) : (
+              <Maximize size={16} />
+            )}
           </button>
         </div>
 

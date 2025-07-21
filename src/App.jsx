@@ -1,5 +1,4 @@
 import React from "react";
-("use client");
 import { useState, useEffect } from "react";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { Sun, Moon, User } from "lucide-react";
@@ -31,6 +30,10 @@ function AppContent() {
 
   // Toggle switch state - for future use
   const [toggleActive, setToggleActive] = useState(true);
+
+  // Add this state for managing fullscreen transitions
+  const [isTransitioningFullscreen, setIsTransitioningFullscreen] =
+    useState(false);
 
   // Check backend connection on app start
   useEffect(() => {
@@ -266,9 +269,21 @@ function AppContent() {
     setSearchTerm(newSearchTerm);
   };
 
-  // Toggle fullscreen mode
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
+  // Update the toggleFullscreen function
+  const toggleFullscreen = async () => {
+    // If sidebar is open in normal mode and we're going to fullscreen
+    if (!isFullscreen && !sidebarCollapsed) {
+      setIsTransitioningFullscreen(true);
+      // First close the sidebar
+      setSidebarCollapsed(true);
+      // Wait for sidebar animation to complete
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      // Then activate fullscreen
+      setIsFullscreen(true);
+      setIsTransitioningFullscreen(false);
+    } else {
+      setIsFullscreen(!isFullscreen);
+    }
   };
 
   // Handle sidebar toggle in fullscreen mode
@@ -336,6 +351,7 @@ function AppContent() {
         collapsed={sidebarCollapsed}
         onToggleCollapse={handleSidebarToggle}
         activeNotesCount={activeNotesCount}
+        isFullscreen={isFullscreen}
       />
 
       <MainContent
@@ -348,41 +364,70 @@ function AppContent() {
         onDeleteNote={deleteNote}
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
+        isTransitioningFullscreen={isTransitioningFullscreen}
       />
 
       {/* Glassmorphic FAB */}
-      <GlassmorphicFAB onCreateNote={createNote} />
+      <GlassmorphicFAB
+        onCreateNote={createNote}
+        selectedNote={selectedNote}
+        sidebarCollapsed={sidebarCollapsed}
+      />
     </div>
   );
 }
 
 // Separate TopBar component that uses theme context
 function TopBar({ toggleActive, setToggleActive }) {
+  const [showComingSoon, setShowComingSoon] = useState(null);
+
+  const handleComingSoon = (feature) => {
+    setShowComingSoon(feature);
+    setTimeout(() => setShowComingSoon(null), 2000);
+  };
+
   return (
     <div className="top-bar">
-      <ThemeToggleButton />
+      <ThemeToggleButton onComingSoon={() => handleComingSoon("theme")} />
       <div
         className={`toggle-switch ${toggleActive ? "active" : "inactive"}`}
-        onClick={() => setToggleActive(!toggleActive)}
+        onClick={() => handleComingSoon("colorSwitch")}
+        title="Coming Soon"
       >
         <div className="toggle-switch-slider"></div>
       </div>
-      <div className="user-icon">
+      <div
+        className="user-icon"
+        onClick={() => handleComingSoon("userPanel")}
+        title="Coming Soon"
+      >
         <User size={18} />
       </div>
+
+      {showComingSoon && (
+        <div className="coming-soon-tooltip">
+          <span>Coming Soon!</span>
+        </div>
+      )}
     </div>
   );
 }
 
 // Separate component for theme toggle that uses the theme context
-function ThemeToggleButton() {
+function ThemeToggleButton({ onComingSoon }) {
   const { isDark, toggleTheme } = useTheme();
+
+  const handleClick = () => {
+    onComingSoon();
+    // Temporarily disable actual theme toggle
+    // toggleTheme();
+  };
 
   return (
     <button
       className="theme-toggle-btn"
-      onClick={toggleTheme}
-      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      onClick={handleClick}
+      title="Coming Soon"
     >
       {isDark ? <Sun size={18} /> : <Moon size={18} />}
     </button>

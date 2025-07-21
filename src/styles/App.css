@@ -159,3 +159,59 @@
   min-width: 0;
   overflow: hidden;
 }
+
+/* Coming Soon Tooltip */
+.coming-soon-tooltip {
+  position: absolute;
+  top: 50px;
+  right: 50%;
+  transform: translateX(50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1001;
+  animation: tooltipFadeIn 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.coming-soon-tooltip::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid rgba(0, 0, 0, 0.9);
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(50%) translateY(0);
+  }
+}
+
+/* Update cursor for coming soon elements */
+.toggle-switch,
+.user-icon,
+.theme-toggle-btn {
+  cursor: pointer;
+}
+
+.toggle-switch:hover,
+.user-icon:hover {
+  opacity: 0.8;
+}

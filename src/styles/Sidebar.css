@@ -11,6 +11,7 @@
 .sidebar-expanded {
   width: 280px;
   min-width: 280px;
+  z-index: 200;
 }
 
 .sidebar-collapsed {
@@ -40,6 +41,45 @@
   animation: slideInFromLeft 0.4s ease-out;
 }
 
+/* Update sidebar header actions to handle the close button */
+.sidebar-header-actions {
+  display: flex;
+  gap: 8px;
+  order: -1; /* Move to the left */
+}
+
+/* Special styling for the close button in fullscreen mode */
+.sidebar-close-btn {
+  width: 40px;
+  height: 40px;
+  background: #e5e5e5;
+  color: #000000;
+  padding: 10px;
+  order: 1; /* Move to the right */
+  margin-left: auto;
+}
+
+.sidebar-close-btn:hover {
+  background-color: #cccccc;
+  color: #000000;
+  transform: scale(1.05);
+}
+
+/* Adjust header layout when close button is present */
+.sidebar-header:has(.sidebar-close-btn) {
+  justify-content: space-between;
+}
+
+.sidebar-header:has(.sidebar-close-btn) .sidebar-header-actions {
+  width: 100%;
+  justify-content: space-between;
+}
+
+/* Ensure proper spacing */
+.sidebar-header:has(.sidebar-close-btn) .header-action-btn:first-child {
+  margin-right: auto;
+}
+
 .sidebar-brand {
   display: flex;
   align-items: center;
@@ -53,12 +93,6 @@
   font-weight: 600;
   color: #ffffff;
   margin: 0;
-}
-
-.sidebar-header-actions {
-  display: flex;
-  gap: 8px;
-  order: -1; /* Move to the left */
 }
 
 .header-action-btn,
@@ -576,7 +610,7 @@
   .sidebar-expanded {
     width: 100%;
     position: absolute;
-    z-index: 1000;
+    z-index: 500;
     background: rgba(88, 88, 88, 0.066);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
@@ -587,4 +621,8 @@
     min-width: 0;
     overflow: hidden;
   }
+}
+
+.app.fullscreen-mode .sidebar-expanded {
+  z-index: 1000;
 }
