@@ -94,7 +94,7 @@ mongod --version
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/cherrycreamsoda/notebook-react.git
 cd notebook-react-app
 ```
 
