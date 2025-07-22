@@ -1,0 +1,174 @@
+/* Top Bar */
+.top-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 8px 0 8px;
+  background: transparent;
+  transition: transform 0.3s ease;
+}
+
+/* Fullscreen mode - hide top bar */
+.app.fullscreen-mode .top-bar {
+  transform: translateY(-100%);
+}
+
+/* Theme Toggle Button in Top Bar */
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  width: 30px;
+  height: 30px;
+}
+
+.theme-toggle-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Beautiful Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 28px;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  overflow: hidden;
+}
+
+.toggle-switch.active {
+  background: linear-gradient(135deg, #14efff, #2be262, #89dc14, #ff2356, #8a2be2);
+  background-size: 300% 300%;
+  animation: gradientMove 20s infinite;
+  box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+}
+
+.toggle-switch.inactive {
+  background: linear-gradient(135deg, #e5e5e5, #cccccc);
+  border-color: #0a0a0a;
+}
+
+.toggle-switch-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch.active .toggle-switch-slider {
+  transform: translateX(32px);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch.inactive .toggle-switch-slider {
+  transform: translateX(0);
+  background: #0a0a0a;
+}
+
+@keyframes gradientMove {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* User Icon */
+.user-icon {
+  margin: 0 3px 0 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e5e5e5, #cccccc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.user-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(229, 229, 229, 0.4);
+  border-color: #e5e5e5;
+}
+
+/* Coming Soon Tooltip */
+.coming-soon-tooltip {
+  position: absolute;
+  top: 50px;
+  right: 50%;
+  transform: translateX(50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1001;
+  animation: tooltipFadeIn 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.coming-soon-tooltip::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid rgba(0, 0, 0, 0.9);
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(50%) translateY(0);
+  }
+}
+
+/* Update cursor for coming soon elements */
+.toggle-switch,
+.user-icon,
+.theme-toggle-btn {
+  cursor: pointer;
+}
+
+.toggle-switch:hover,
+.user-icon:hover {
+  opacity: 0.8;
+}
