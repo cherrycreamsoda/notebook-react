@@ -1,4 +1,5 @@
 import React from "react";
+("use client");
 import {
   PanelLeftOpen,
   PanelLeftClose,
@@ -80,6 +81,7 @@ const MainContent = ({
         pinLoading={pinLoading}
         deleteLoading={deleteLoading}
       />
+
       <div className="main-content-inner">
         <NoteEditor selectedNote={selectedNote} onUpdateNote={onUpdateNote} />
       </div>

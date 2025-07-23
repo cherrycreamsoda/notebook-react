@@ -5,7 +5,7 @@ const noteSchema = new mongoose.Schema(
     title: {
       type: String,
       default: "",
-      trim: true,
+      // Removed trim: true to preserve spaces in titles
       maxlength: 200,
     },
     content: {
