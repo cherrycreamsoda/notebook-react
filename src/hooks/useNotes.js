@@ -53,6 +53,28 @@ export const useNotes = () => {
     }, "Failed to load notes");
   };
 
+  // New function to fetch a specific note's latest data
+  const fetchNoteById = async (noteId) => {
+    return execute(async () => {
+      // Find the note in our current data first
+      const existingNote =
+        allNotes.find((note) => note._id === noteId) ||
+        notes.find((note) => note._id === noteId);
+
+      if (existingNote) {
+        return existingNote;
+      }
+
+      // If not found locally, we could fetch from server, but for now return null
+      return null;
+    }, "Failed to fetch note");
+  };
+
+  // Updated setSelectedNote to be a simple setter without fetching
+  const selectNote = (note) => {
+    setSelectedNote(note);
+  };
+
   const createNote = async (noteData = {}) => {
     return execute(async () => {
       // Check if the last note is still empty/unchanged
@@ -195,12 +217,13 @@ export const useNotes = () => {
     notes,
     allNotes,
     selectedNote,
-    setSelectedNote,
+    setSelectedNote: selectNote, // Use the new selectNote function
     counts,
     loading,
     error,
     clearError,
     loadNotes,
+    fetchNoteById,
     createNote,
     updateNote,
     deleteNote,

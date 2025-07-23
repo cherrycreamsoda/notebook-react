@@ -5,13 +5,17 @@ const noteSchema = new mongoose.Schema(
     title: {
       type: String,
       default: "",
-      // Removed trim: true to preserve spaces in titles
       maxlength: 200,
     },
     content: {
       type: String,
       default: "",
       maxlength: 50000,
+    },
+    type: {
+      type: String,
+      enum: ["RICH_TEXT", "TEXT", "CHECKLIST", "REMINDERS", "DATASHEET"],
+      default: "RICH_TEXT",
     },
     isPinned: {
       type: Boolean,
@@ -30,6 +34,7 @@ const noteSchema = new mongoose.Schema(
 // Indexes for better performance
 noteSchema.index({ isDeleted: 1, isPinned: 1, updatedAt: -1 });
 noteSchema.index({ title: "text", content: "text" });
+noteSchema.index({ type: 1 });
 
 // Static methods for common queries
 noteSchema.statics.getActiveNotes = function () {
@@ -59,6 +64,14 @@ noteSchema.statics.searchNotes = function (query, includeDeleted = false) {
     ],
   };
   return this.find(searchFilter).sort({ isPinned: -1, updatedAt: -1 });
+};
+
+noteSchema.statics.getNotesByType = function (type, includeDeleted = false) {
+  const filter = { type };
+  if (!includeDeleted) {
+    filter.isDeleted = false;
+  }
+  return this.find(filter).sort({ isPinned: -1, updatedAt: -1 });
 };
 
 module.exports = mongoose.model("Note", noteSchema);
