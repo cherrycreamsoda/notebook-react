@@ -87,7 +87,16 @@ export const useNotes = () => {
         return selectedNote;
       }
 
-      const newNote = await notesAPI.createNote(noteData);
+      // Default to RICH_TEXT type if not specified
+      const noteWithDefaults = {
+        title: "New Note",
+        content: "",
+        isPinned: false,
+        type: "RICH_TEXT",
+        ...noteData,
+      };
+
+      const newNote = await notesAPI.createNote(noteWithDefaults);
       setNotes((prev) => [newNote, ...prev]);
       setAllNotes((prev) => [newNote, ...prev]);
       setSelectedNote(newNote);

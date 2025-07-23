@@ -694,5 +694,15 @@
 
 /* Remove all focus outlines globally for this component */
 .note-editor *:focus {
-  outline: none\;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.note-editor input:focus,
+.note-editor div:focus,
+.note-editor textarea:focus,
+.note-editor [contenteditable]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }

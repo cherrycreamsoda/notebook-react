@@ -23,10 +23,11 @@ const apiCall = async (endpoint, options = {}) => {
 };
 
 export const notesAPI = {
-  getAllNotes: async (view = "", search = "") => {
+  getAllNotes: async (view = "", search = "", type = "") => {
     const params = new URLSearchParams();
     if (view) params.append("view", view);
     if (search) params.append("search", search);
+    if (type) params.append("type", type);
 
     const endpoint = `/notes${params.toString() ? `?${params}` : ""}`;
     const result = await apiCall(endpoint);
@@ -45,6 +46,7 @@ export const notesAPI = {
         title: "New Note",
         content: "",
         isPinned: false,
+        type: "RICH_TEXT",
         ...noteData,
       }),
     });
