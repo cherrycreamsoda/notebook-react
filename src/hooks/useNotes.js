@@ -114,15 +114,73 @@ export const useNotes = () => {
 
   const clearAllDeleted = async () => {
     return execute(async () => {
-      const deletedNotes = allNotes.filter((note) => note.isDeleted);
-      await Promise.all(
-        deletedNotes.map((note) => notesAPI.permanentDelete(note._id))
+      // First, refresh the notes to get the latest state
+      const latestAllNotes = await notesAPI.getAllNotesIncludingDeleted();
+      const deletedNotes = latestAllNotes.filter((note) => note.isDeleted);
+
+      if (deletedNotes.length === 0) {
+        // No deleted notes to clear
+        return { success: true, deletedCount: 0, errors: [] };
+      }
+
+      // Use Promise.allSettled to handle individual failures gracefully
+      const deleteResults = await Promise.allSettled(
+        deletedNotes.map(async (note) => {
+          try {
+            await notesAPI.permanentDelete(note._id);
+            return { success: true, noteId: note._id, title: note.title };
+          } catch (error) {
+            return {
+              success: false,
+              noteId: note._id,
+              title: note.title,
+              error: error.message,
+            };
+          }
+        })
       );
 
+      // Process results
+      const successful = [];
+      const failed = [];
+
+      deleteResults.forEach((result) => {
+        if (result.status === "fulfilled") {
+          if (result.value.success) {
+            successful.push(result.value);
+            // Remove from local state
+            removeNoteFromArrays(result.value.noteId);
+          } else {
+            failed.push(result.value);
+          }
+        } else {
+          failed.push({ error: result.reason?.message || "Unknown error" });
+        }
+      });
+
+      // Clear selected note if it was deleted
       if (selectedNote?.isDeleted) {
         setSelectedNote(null);
       }
-      return true;
+
+      // If some deletions failed, throw an error with details
+      if (failed.length > 0 && successful.length === 0) {
+        throw new Error(
+          `Failed to delete any notes. Errors: ${failed
+            .map((f) => f.error)
+            .join(", ")}`
+        );
+      } else if (failed.length > 0) {
+        console.warn(`Some notes could not be deleted:`, failed);
+        // Still return success if at least some were deleted
+      }
+
+      return {
+        success: true,
+        deletedCount: successful.length,
+        failedCount: failed.length,
+        errors: failed,
+      };
     }, "Failed to clear deleted notes");
   };
 

@@ -75,10 +75,22 @@ export const notesAPI = {
   },
 
   permanentDelete: async (id) => {
-    const result = await apiCall(`/notes/${id}/permanent`, {
-      method: "DELETE",
-    });
-    return result.data;
+    try {
+      const result = await apiCall(`/notes/${id}/permanent`, {
+        method: "DELETE",
+      });
+      return result.data;
+    } catch (error) {
+      // If note is already deleted or doesn't exist, don't throw error
+      if (
+        error.message.includes("Note not found") ||
+        error.message.includes("404")
+      ) {
+        console.warn(`Note ${id} was already deleted or doesn't exist`);
+        return { id, alreadyDeleted: true };
+      }
+      throw error;
+    }
   },
 };
 
