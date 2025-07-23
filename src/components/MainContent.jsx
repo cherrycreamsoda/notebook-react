@@ -1,5 +1,6 @@
-import React from "react";
-("use client");
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
 import {
   PanelLeftOpen,
   PanelLeftClose,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import LoadingSpinner from "./LoadingSpinner";
 import NoteEditor from "./NoteEditor";
+
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import "../styles/MainContent.css";
 
@@ -23,9 +25,45 @@ const MainContent = ({
   isFullscreen,
   onToggleFullscreen,
   isTransitioningFullscreen,
+  headerBackgroundEnabled,
 }) => {
   const { loading: pinLoading, execute: executePin } = useAsyncAction();
   const { loading: deleteLoading, execute: executeDelete } = useAsyncAction();
+  const headerRef = useRef(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isDisabling, setIsDisabling] = useState(false);
+
+  // Handle image lazy loading with fade-in effect
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header || !headerBackgroundEnabled) return;
+
+    setImageLoaded(false);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      setImageLoaded(true);
+    };
+    img.onerror = () => {
+      console.warn("Header background image failed to load");
+    };
+    img.src = "/images/marble-header-bg.jpg";
+  }, [headerBackgroundEnabled]);
+
+  // Handle background disable animation
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    if (!headerBackgroundEnabled && imageLoaded) {
+      setIsDisabling(true);
+      // Reset after animation completes
+      setTimeout(() => {
+        setIsDisabling(false);
+        setImageLoaded(false);
+      }, 800);
+    }
+  }, [headerBackgroundEnabled, imageLoaded]);
 
   const handleTogglePin = () => {
     if (!selectedNote) return;
@@ -40,6 +78,24 @@ const MainContent = ({
     );
   };
 
+  const getHeaderClasses = () => {
+    let classes = "main-header";
+
+    if (headerBackgroundEnabled) {
+      classes += " background-enabled";
+      if (imageLoaded) {
+        classes += " image-loaded";
+      }
+    } else {
+      classes += " background-disabled";
+      if (isDisabling) {
+        classes += " fading-out";
+      }
+    }
+
+    return classes;
+  };
+
   if (!selectedNote) {
     return (
       <div
@@ -48,6 +104,8 @@ const MainContent = ({
         } ${isFullscreen ? "fullscreen" : ""}`}
       >
         <MainHeader
+          ref={headerRef}
+          className={getHeaderClasses()}
           sidebarCollapsed={sidebarCollapsed}
           onToggleSidebar={onToggleSidebar}
           isFullscreen={isFullscreen}
@@ -70,6 +128,8 @@ const MainContent = ({
       }`}
     >
       <MainHeader
+        ref={headerRef}
+        className={getHeaderClasses()}
         sidebarCollapsed={sidebarCollapsed}
         onToggleSidebar={onToggleSidebar}
         isFullscreen={isFullscreen}
@@ -89,79 +149,87 @@ const MainContent = ({
   );
 };
 
-const MainHeader = ({
-  sidebarCollapsed,
-  onToggleSidebar,
-  isFullscreen,
-  onToggleFullscreen,
-  isTransitioningFullscreen,
-  selectedNote,
-  onTogglePin,
-  onDelete,
-  pinLoading,
-  deleteLoading,
-}) => (
-  <div className="main-header">
-    <div className="header-left-actions">
-      <button
-        className="sidebar-toggle-btn-main"
-        onClick={onToggleSidebar}
-        title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-      >
-        {sidebarCollapsed ? (
-          <PanelLeftOpen size={16} />
-        ) : (
-          <PanelLeftClose size={16} />
-        )}
-      </button>
-      <button
-        className="fullscreen-toggle-btn"
-        onClick={onToggleFullscreen}
-        title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-        disabled={isTransitioningFullscreen}
-      >
-        {isTransitioningFullscreen ? (
-          <LoadingSpinner size={16} inline={true} showMessage={false} />
-        ) : isFullscreen ? (
-          <Minimize size={16} />
-        ) : (
-          <Maximize size={16} />
-        )}
-      </button>
-    </div>
-
-    {selectedNote && (
-      <div className="note-header-actions">
+const MainHeader = React.forwardRef(
+  (
+    {
+      className,
+      sidebarCollapsed,
+      onToggleSidebar,
+      isFullscreen,
+      onToggleFullscreen,
+      isTransitioningFullscreen,
+      selectedNote,
+      onTogglePin,
+      onDelete,
+      pinLoading,
+      deleteLoading,
+    },
+    ref
+  ) => (
+    <div className={className} ref={ref}>
+      <div className="header-left-actions">
         <button
-          className={`note-header-btn pin-btn ${
-            selectedNote.isPinned ? "active" : ""
-          }`}
-          onClick={onTogglePin}
-          title={selectedNote.isPinned ? "Unpin note" : "Pin note"}
-          disabled={pinLoading}
+          className="sidebar-toggle-btn-main"
+          onClick={onToggleSidebar}
+          title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
-          {pinLoading ? (
-            <LoadingSpinner size={14} inline={true} showMessage={false} />
+          {sidebarCollapsed ? (
+            <PanelLeftOpen size={16} />
           ) : (
-            <Pin size={14} />
+            <PanelLeftClose size={16} />
           )}
         </button>
-
         <button
-          className="note-header-btn delete-btn"
-          onClick={onDelete}
-          title="Delete note"
-          disabled={deleteLoading}
+          className="fullscreen-toggle-btn"
+          onClick={onToggleFullscreen}
+          title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          disabled={isTransitioningFullscreen}
         >
-          {deleteLoading ? (
-            <LoadingSpinner size={14} inline={true} showMessage={false} />
+          {isTransitioningFullscreen ? (
+            <LoadingSpinner size={16} inline={true} showMessage={false} />
+          ) : isFullscreen ? (
+            <Minimize size={16} />
           ) : (
-            <Trash2 size={14} />
+            <Maximize size={16} />
           )}
         </button>
       </div>
-    )}
-  </div>
+
+      {selectedNote && (
+        <div className="note-header-actions">
+          <button
+            className={`note-header-btn pin-btn ${
+              selectedNote.isPinned ? "active" : ""
+            }`}
+            onClick={onTogglePin}
+            title={selectedNote.isPinned ? "Unpin note" : "Pin note"}
+            disabled={pinLoading}
+          >
+            {pinLoading ? (
+              <LoadingSpinner size={14} inline={true} showMessage={false} />
+            ) : (
+              <Pin size={14} />
+            )}
+          </button>
+
+          <button
+            className="note-header-btn delete-btn"
+            onClick={onDelete}
+            title="Delete note"
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? (
+              <LoadingSpinner size={14} inline={true} showMessage={false} />
+            ) : (
+              <Trash2 size={14} />
+            )}
+          </button>
+        </div>
+      )}
+    </div>
+  )
 );
+
+MainHeader.displayName = "MainHeader";
 
 export default MainContent;

@@ -8,6 +8,8 @@ export const useNotes = () => {
   const [notes, setNotes] = useState([]);
   const [allNotes, setAllNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [lastCreatedNote, setLastCreatedNote] = useState(null);
+  const [createError, setCreateError] = useState(null);
   const { loading, error, execute, clearError } = useAsyncAction();
 
   const updateNoteInArrays = (noteId, updatedNote) => {
@@ -73,18 +75,38 @@ export const useNotes = () => {
   // Updated setSelectedNote to be a simple setter without fetching
   const selectNote = (note) => {
     setSelectedNote(note);
+    // Clear any create errors when selecting a note
+    setCreateError(null);
   };
 
   const createNote = async (noteData = {}) => {
     return execute(async () => {
-      // Check if the last note is still empty/unchanged
-      if (
-        selectedNote &&
-        selectedNote.title === "New Note" &&
-        (!selectedNote.content || selectedNote.content.trim() === "")
-      ) {
-        // Don't create a new note, just focus on the existing empty one
-        return selectedNote;
+      // Check if we just created a note and it's still empty
+      if (lastCreatedNote) {
+        const isLastNoteEmpty =
+          lastCreatedNote.title === "New Note" &&
+          (!lastCreatedNote.content ||
+            (typeof lastCreatedNote.content === "string" &&
+              lastCreatedNote.content.trim() === "") ||
+            (typeof lastCreatedNote.content === "object" &&
+              lastCreatedNote.content.items &&
+              lastCreatedNote.content.items.length === 1 &&
+              !lastCreatedNote.content.items[0].text));
+
+        if (isLastNoteEmpty) {
+          // Show error and focus on existing note
+          setCreateError(
+            "Note already created. Please add content to the existing note first."
+          );
+          setSelectedNote(lastCreatedNote);
+
+          // Clear error after 3 seconds
+          setTimeout(() => {
+            setCreateError(null);
+          }, 3000);
+
+          return lastCreatedNote;
+        }
       }
 
       // Default to RICH_TEXT type if not specified
@@ -100,6 +122,8 @@ export const useNotes = () => {
       setNotes((prev) => [newNote, ...prev]);
       setAllNotes((prev) => [newNote, ...prev]);
       setSelectedNote(newNote);
+      setLastCreatedNote(newNote);
+      setCreateError(null);
       return newNote;
     }, "Failed to create note");
   };
@@ -108,6 +132,12 @@ export const useNotes = () => {
     return execute(async () => {
       const updatedNote = await notesAPI.updateNote(id, updates);
       updateNoteInArrays(id, updatedNote);
+
+      // Update lastCreatedNote if it's the same note
+      if (lastCreatedNote?._id === id) {
+        setLastCreatedNote(updatedNote);
+      }
+
       return updatedNote;
     }, "Failed to update note");
   };
@@ -115,7 +145,12 @@ export const useNotes = () => {
   const deleteNote = async (id) => {
     return execute(async () => {
       await notesAPI.deleteNote(id);
-      // Reload to get updated data
+
+      // Clear lastCreatedNote if it's the deleted note
+      if (lastCreatedNote?._id === id) {
+        setLastCreatedNote(null);
+      }
+
       return true;
     }, "Failed to delete note");
   };
@@ -124,6 +159,12 @@ export const useNotes = () => {
     return execute(async () => {
       await notesAPI.permanentDelete(id);
       removeNoteFromArrays(id);
+
+      // Clear lastCreatedNote if it's the deleted note
+      if (lastCreatedNote?._id === id) {
+        setLastCreatedNote(null);
+      }
+
       return true;
     }, "Failed to permanently delete note");
   };
@@ -194,6 +235,11 @@ export const useNotes = () => {
         setSelectedNote(null);
       }
 
+      // Clear lastCreatedNote if it was deleted
+      if (lastCreatedNote?.isDeleted) {
+        setLastCreatedNote(null);
+      }
+
       // If some deletions failed, throw an error with details
       if (failed.length > 0 && successful.length === 0) {
         throw new Error(
@@ -226,11 +272,15 @@ export const useNotes = () => {
     notes,
     allNotes,
     selectedNote,
-    setSelectedNote: selectNote, // Use the new selectNote function
+    setSelectedNote: selectNote,
     counts,
     loading,
     error,
-    clearError,
+    createError,
+    clearError: () => {
+      clearError();
+      setCreateError(null);
+    },
     loadNotes,
     fetchNoteById,
     createNote,

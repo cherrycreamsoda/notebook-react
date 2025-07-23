@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Bold,
   Italic,
@@ -11,6 +10,8 @@ import {
 } from "lucide-react";
 import { useDebounce } from "../hooks/useDebounce";
 import NoteTypeDropdown from "./NoteTypeDropdown";
+import ChecklistEditor from "./ChecklistEditor";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 const NoteEditor = ({ selectedNote, onUpdateNote }) => {
   const [title, setTitle] = useState("");
@@ -33,15 +34,50 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
   const [isUserEditing, setIsUserEditing] = useState(false);
   const [lastNoteId, setLastNoteId] = useState(null);
   const [shouldBlinkDropdown, setShouldBlinkDropdown] = useState(false);
+  const [typeChangeConfirmation, setTypeChangeConfirmation] = useState(null);
+  const [shouldFocusTitle, setShouldFocusTitle] = useState(false);
   const titleInputRef = useRef(null);
   const contentRef = useRef(null);
   const plainTextRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const cursorPositionRef = useRef(null);
 
-  // Determine if current note is plain text
-  const isPlainText = selectedNote?.type === "TEXT";
+  // Determine note type and content
   const noteType = selectedNote?.type || "RICH_TEXT";
+  const isPlainText = noteType === "TEXT";
+  const isChecklist = noteType === "CHECKLIST";
+  const isRichText = noteType === "RICH_TEXT";
+
+  // Focus management for new notes
+  useEffect(() => {
+    if (shouldFocusTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+      setShouldFocusTitle(false);
+    }
+  }, [shouldFocusTitle]);
+
+  // Handle Enter key in title to move to content
+  const handleTitleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      // Focus appropriate content area based on note type
+      if (isPlainText && plainTextRef.current) {
+        plainTextRef.current.focus();
+      } else if (isRichText && contentRef.current) {
+        contentRef.current.focus();
+      } else if (isChecklist) {
+        // For checklist, focus the first input
+        const firstInput = document.querySelector(
+          ".checklist-editor .item-input"
+        );
+        if (firstInput) {
+          firstInput.focus();
+        }
+      }
+    }
+  };
 
   // Save cursor position with better handling for list elements
   const saveCursorPosition = useCallback(() => {
@@ -130,7 +166,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
   // Debounced button state updates to prevent flickering
   const { debouncedCallback: debouncedUpdateButtonStates } = useDebounce(() => {
-    if (!contentRef.current || (isTyping && !hasStartedTyping) || isPlainText)
+    if (!contentRef.current || (isTyping && !hasStartedTyping) || !isRichText)
       return;
 
     const selection = window.getSelection();
@@ -150,7 +186,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
   // Immediate button state updates (for formatting buttons)
   const updateButtonStatesImmediate = useCallback(() => {
-    if (!contentRef.current || isPlainText) return;
+    if (!contentRef.current || !isRichText) return;
 
     const selection = window.getSelection();
     const hasTextSelection = selection && !selection.isCollapsed;
@@ -165,7 +201,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
       insertOrderedList: document.queryCommandState("insertOrderedList"),
       heading: document.queryCommandValue("formatBlock") === "h3",
     });
-  }, [isPlainText]);
+  }, [isRichText]);
 
   // Handle typing state
   const handleTypingStart = () => {
@@ -178,7 +214,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
     }
     typingTimeoutRef.current = setTimeout(() => {
       setIsTyping(false);
-      if (!isPlainText) {
+      if (isRichText) {
         debouncedUpdateButtonStates();
       }
     }, 200);
@@ -186,7 +222,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
   // Listen for selection changes (but debounced during initial typing)
   useEffect(() => {
-    if (isPlainText) return;
+    if (!isRichText) return;
 
     const handleSelectionChange = () => {
       if (!isTyping || hasStartedTyping) {
@@ -197,7 +233,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
     document.addEventListener("selectionchange", handleSelectionChange);
     return () =>
       document.removeEventListener("selectionchange", handleSelectionChange);
-  }, [debouncedUpdateButtonStates, isTyping, hasStartedTyping, isPlainText]);
+  }, [debouncedUpdateButtonStates, isTyping, hasStartedTyping, isRichText]);
 
   // Handle note changes - ONLY when a new note is selected, no automatic fetching
   useEffect(() => {
@@ -212,6 +248,21 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
         setHasStartedTyping(false);
         setLastNoteId(noteId);
 
+        // Check if this is a newly created note that should get focus
+        const isNewlyCreated =
+          selectedNote.title === "New Note" &&
+          (!selectedNote.content ||
+            (typeof selectedNote.content === "string" &&
+              selectedNote.content.trim() === "") ||
+            (typeof selectedNote.content === "object" &&
+              selectedNote.content.items &&
+              selectedNote.content.items.length === 1 &&
+              !selectedNote.content.items[0].text));
+
+        if (isNewlyCreated) {
+          setShouldFocusTitle(true);
+        }
+
         // Handle content based on note type
         if (isPlainText) {
           // For plain text, set textarea value
@@ -219,18 +270,23 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
             plainTextRef.current.value = selectedNote.content || "";
             updateCounts(selectedNote.content || "");
           }
-        } else {
+        } else if (isRichText) {
           // For rich text, set innerHTML
           if (contentRef.current) {
             contentRef.current.innerHTML = selectedNote.content || "";
             updateCounts(selectedNote.content || "");
           }
+        } else if (isChecklist) {
+          // For checklist, content is handled by ChecklistEditor
+          // Make sure we have a valid content structure
+          const checklistContent = selectedNote.content || { items: [] };
+          updateCounts(checklistContent);
         }
 
         setIsInitialLoad(false);
 
         // Initialize button states for rich text notes
-        if (!isPlainText) {
+        if (isRichText) {
           setTimeout(() => {
             if (contentRef.current) {
               updateButtonStatesImmediate();
@@ -244,16 +300,31 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
       setIsUserEditing(false);
       setLastNoteId(null);
     }
-  }, [selectedNote, updateButtonStatesImmediate, isPlainText]);
+  }, [
+    selectedNote,
+    updateButtonStatesImmediate,
+    isPlainText,
+    isRichText,
+    isChecklist,
+  ]);
 
   const updateCounts = (content) => {
-    let plainText = content;
+    let plainText = "";
 
-    if (!isPlainText) {
+    if (isPlainText) {
+      plainText = content || "";
+    } else if (isRichText) {
       // For rich text, extract plain text from HTML
       const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = content;
+      tempDiv.innerHTML = content || "";
       plainText = tempDiv.textContent || tempDiv.innerText || "";
+    } else if (isChecklist) {
+      // For checklist, extract text from items
+      if (content && content.items && Array.isArray(content.items)) {
+        plainText = content.items.map((item) => item.text || "").join(" ");
+      } else {
+        plainText = "";
+      }
     }
 
     const words = plainText.trim() ? plainText.trim().split(/\s+/).length : 0;
@@ -278,8 +349,8 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
   const { debouncedCallback: debouncedUpdate, cleanup } = useDebounce(
     handleUpdate,
-    800
-  );
+    1500
+  ); // Increased to 1.5 seconds
 
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
@@ -288,7 +359,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
     debouncedUpdate("title", newTitle);
   };
 
-  const handleContentChange = () => {
+  const handleContentChange = (newContent) => {
     if (isPlainText) {
       // Handle plain text content
       if (!plainTextRef.current) return;
@@ -298,7 +369,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
       const textContent = plainTextRef.current.value;
       updateCounts(textContent);
       debouncedUpdate("content", textContent);
-    } else {
+    } else if (isRichText) {
       // Handle rich text content
       if (!contentRef.current) return;
 
@@ -307,43 +378,79 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
       const htmlContent = contentRef.current.innerHTML;
       updateCounts(htmlContent);
       debouncedUpdate("content", htmlContent);
+    } else if (isChecklist) {
+      // Handle checklist content - newContent is already the object we need
+      setIsUserEditing(true);
+      updateCounts(newContent);
+      debouncedUpdate("content", newContent);
     }
   };
 
   const handleTypeChange = async (newType) => {
     if (!selectedNote || selectedNote.type === newType) return;
 
-    // Convert content if needed
-    let convertedContent = selectedNote.content || "";
+    // Always clear content before changing type to avoid type errors
+    // First update to empty content, then change type
+    await handleUpdate("content", "");
 
-    if (selectedNote.type === "RICH_TEXT" && newType === "TEXT") {
-      // Convert from HTML to plain text
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = convertedContent;
-      convertedContent = tempDiv.textContent || tempDiv.innerText || "";
-    } else if (selectedNote.type === "TEXT" && newType === "RICH_TEXT") {
-      // Convert from plain text to HTML (escape HTML and preserve line breaks)
-      convertedContent = convertedContent
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\n/g, "<br>");
+    // Set default content based on new type
+    let newContent = "";
+    if (newType === "CHECKLIST") {
+      newContent = {
+        items: [{ id: Date.now().toString(), text: "", checked: false }],
+      };
+    } else {
+      newContent = "";
     }
 
     // Update the note type and content
     await handleUpdate("type", newType);
-    if (convertedContent !== selectedNote.content) {
-      await handleUpdate("content", convertedContent);
-    }
+    await handleUpdate("content", newContent);
 
     // Trigger blink effect
     setShouldBlinkDropdown(true);
     setTimeout(() => setShouldBlinkDropdown(false), 1000);
   };
 
+  const performTypeChange = async (newType) => {
+    if (!selectedNote) return;
+
+    // Always clear content first
+    await handleUpdate("content", "");
+
+    // Set default content based on new type
+    let newContent = "";
+    if (newType === "CHECKLIST") {
+      newContent = {
+        items: [{ id: Date.now().toString(), text: "", checked: false }],
+      };
+    } else {
+      newContent = "";
+    }
+
+    // Update the note type and content
+    await handleUpdate("type", newType);
+    await handleUpdate("content", newContent);
+
+    // Trigger blink effect
+    setShouldBlinkDropdown(true);
+    setTimeout(() => setShouldBlinkDropdown(false), 1000);
+  };
+
+  const confirmTypeChange = async () => {
+    if (typeChangeConfirmation) {
+      await performTypeChange(typeChangeConfirmation.newType);
+      setTypeChangeConfirmation(null);
+    }
+  };
+
+  const cancelTypeChange = () => {
+    setTypeChangeConfirmation(null);
+  };
+
   // Smart heading toggle
   const toggleHeading = () => {
-    if (isPlainText) return;
+    if (!isRichText) return;
 
     const isCurrentlyHeading =
       document.queryCommandValue("formatBlock") === "h3";
@@ -361,7 +468,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
   // Smart formatting for bold/italic/underline/strikethrough
   const smartFormat = (command) => {
-    if (isPlainText) return;
+    if (!isRichText) return;
 
     document.execCommand(command, false, null);
     contentRef.current?.focus();
@@ -371,7 +478,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
   // Improved list formatting with cursor position preservation
   const toggleList = (command) => {
-    if (isPlainText) return;
+    if (!isRichText) return;
 
     // Execute the list command
     document.execCommand(command, false, null);
@@ -488,7 +595,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
   // Handle keyboard shortcuts
   const handleKeyDown = (e) => {
-    if (isPlainText) return;
+    if (!isRichText) return;
 
     if (e.ctrlKey || e.metaKey) {
       switch (e.key) {
@@ -509,7 +616,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
   };
 
   const handlePaste = (e) => {
-    if (isPlainText) return;
+    if (!isRichText) return;
 
     e.preventDefault();
     const text = e.clipboardData.getData("text/plain");
@@ -519,13 +626,13 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
   // Handle mouse events for button state updates
   const handleMouseUp = () => {
-    if (hasStartedTyping && !isPlainText) {
+    if (hasStartedTyping && isRichText) {
       updateButtonStatesImmediate();
     }
   };
 
   const handleKeyUp = (e) => {
-    if (isPlainText) return;
+    if (!isRichText) return;
 
     // Only update button states for navigation keys, not typing keys
     const navigationKeys = [
@@ -547,6 +654,59 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
     return cleanup;
   }, [cleanup]);
 
+  const renderEditor = () => {
+    if (isChecklist) {
+      return (
+        <ChecklistEditor
+          content={selectedNote?.content}
+          onContentChange={handleContentChange}
+        />
+      );
+    } else if (isPlainText) {
+      return (
+        <textarea
+          ref={plainTextRef}
+          onChange={handleContentChange}
+          className="note-content-textarea"
+          placeholder="Start writing your note..."
+        />
+      );
+    } else {
+      return (
+        <div
+          ref={contentRef}
+          contentEditable
+          onInput={handleContentChange}
+          onKeyDown={handleKeyDown}
+          onKeyUp={handleKeyUp}
+          onPaste={handlePaste}
+          onMouseUp={handleMouseUp}
+          className="note-content-input"
+          data-placeholder="Start writing your note..."
+          suppressContentEditableWarning={true}
+        />
+      );
+    }
+  };
+
+  const getEditorModeIndicator = () => {
+    if (isPlainText) {
+      return (
+        <div className="editor-mode-indicator">
+          <Type size={14} />
+          <span>Plain Text Mode</span>
+        </div>
+      );
+    } else if (isChecklist) {
+      return (
+        <div className="editor-mode-indicator">
+          <span>Checklist Mode</span>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       {/* Formatting Toolbar - will be positioned by MainContent */}
@@ -561,7 +721,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
 
           <div className="toolbar-separator"></div>
 
-          {!isPlainText &&
+          {isRichText &&
             formatActions.map((action, index) => (
               <button
                 key={index}
@@ -575,12 +735,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
               </button>
             ))}
 
-          {isPlainText && (
-            <div className="plain-text-indicator">
-              <Type size={14} />
-              <span>Plain Text Mode</span>
-            </div>
-          )}
+          {getEditorModeIndicator()}
         </div>
       </div>
 
@@ -592,6 +747,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
             type="text"
             value={title}
             onChange={handleTitleChange}
+            onKeyDown={handleTitleKeyDown}
             placeholder="Untitled"
             className="note-title-input"
           />
@@ -604,29 +760,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
         </div>
 
         <div className="editor-container">
-          <div className="content-wrapper">
-            {isPlainText ? (
-              <textarea
-                ref={plainTextRef}
-                onChange={handleContentChange}
-                className="note-content-textarea"
-                placeholder="Start writing your note..."
-              />
-            ) : (
-              <div
-                ref={contentRef}
-                contentEditable
-                onInput={handleContentChange}
-                onKeyDown={handleKeyDown}
-                onKeyUp={handleKeyUp}
-                onPaste={handlePaste}
-                onMouseUp={handleMouseUp}
-                className="note-content-input"
-                data-placeholder="Start writing your note..."
-                suppressContentEditableWarning={true}
-              />
-            )}
-          </div>
+          <div className="content-wrapper">{renderEditor()}</div>
         </div>
       </div>
 
@@ -637,6 +771,23 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
           <span className="char-count">{charCount} characters</span>
         </div>
       </div>
+
+      {/* Type Change Confirmation Dialog */}
+      {typeChangeConfirmation && (
+        <ConfirmationDialog
+          title={typeChangeConfirmation.title}
+          message={typeChangeConfirmation.message}
+          onConfirm={confirmTypeChange}
+          onCancel={cancelTypeChange}
+          position={{
+            top: window.innerHeight / 2 - 100,
+            left: window.innerWidth / 2 - 200,
+          }}
+          confirmText="Change Type"
+          cancelText="Cancel"
+          type="warning"
+        />
+      )}
     </>
   );
 };

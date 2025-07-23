@@ -7,10 +7,23 @@ import {
   Trash2,
   Pin,
   StickyNote,
+  FileText,
+  Type,
+  CheckSquare,
+  Bell,
+  Table,
 } from "lucide-react";
 import LoadingSpinner from "./LoadingSpinner";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { formatDate, getPreview } from "../utils/dateUtils";
+
+const NOTE_TYPE_ICONS = {
+  RICH_TEXT: FileText,
+  TEXT: Type,
+  CHECKLIST: CheckSquare,
+  REMINDERS: Bell,
+  DATASHEET: Table,
+};
 
 const NoteList = ({
   notes,
@@ -23,6 +36,7 @@ const NoteList = ({
   onRestoreNote,
   onTogglePin,
   onCreateNote,
+  onClearAllDeleted,
   searchTerm,
   onSearchClear,
 }) => {
@@ -118,20 +132,38 @@ const NoteList = ({
     const rect = event.target.getBoundingClientRect();
     setConfirmDialog({
       noteId,
-      message: "Permanently delete this note?",
+      message: "Permanently delete this note? This action cannot be undone.",
+      title: "Delete Note Permanently?",
+      type: "danger",
       position: {
-        top: rect.top - 80,
-        left: rect.left - 150,
+        top: rect.top - 100,
+        left: rect.left - 200,
       },
     });
   };
 
-  const confirmPermanentDelete = async () => {
+  const handleClearAllDeleted = (event) => {
+    const rect = event.target.getBoundingClientRect();
+    setConfirmDialog({
+      action: "clearAll",
+      message: `Permanently delete all ${notes.length} deleted notes? This action cannot be undone.`,
+      title: "Delete All Notes?",
+      type: "danger",
+      position: {
+        top: rect.top - 100,
+        left: rect.left - 200,
+      },
+    });
+  };
+
+  const confirmAction = async () => {
     if (confirmDialog.noteId) {
       await handleAction(
         () => onPermanentDelete(confirmDialog.noteId),
         `permanent-${confirmDialog.noteId}`
       );
+    } else if (confirmDialog.action === "clearAll") {
+      await handleAction(() => onClearAllDeleted(), "clear-all");
     }
     setConfirmDialog(null);
   };
@@ -162,7 +194,18 @@ const NoteList = ({
           )}
           <h3 className="section-title">{getSectionTitle()}</h3>
         </div>
-        <span className="section-count">{notes.length}</span>
+        <div className="section-actions">
+          <span className="section-count">{notes.length}</span>
+          {currentView === "deleted" && notes.length > 0 && (
+            <button
+              className="clear-all-btn"
+              onClick={handleClearAllDeleted}
+              title="Delete all permanently"
+            >
+              <Trash2 size={12} />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="notes-list">
@@ -211,12 +254,14 @@ const NoteList = ({
 
       {confirmDialog && (
         <ConfirmationDialog
+          title={confirmDialog.title}
           message={confirmDialog.message}
           position={confirmDialog.position}
-          onConfirm={confirmPermanentDelete}
+          onConfirm={confirmAction}
           onCancel={() => setConfirmDialog(null)}
           confirmText="Delete"
           cancelText="Cancel"
+          type={confirmDialog.type}
         />
       )}
     </div>
@@ -256,81 +301,97 @@ const NoteItem = ({
   onTogglePin,
   onPermanentDelete,
   loadingStates,
-}) => (
-  <div
-    className={`note-item ${isSelected ? "selected" : ""} ${
-      isKeyboardSelected ? "keyboard-selected" : ""
-    }`}
-    style={{ "--item-index": index }}
-    onClick={onSelect}
-  >
-    <div className="note-content">
-      <h4 className="note-title">{note.title || "Untitled"}</h4>
-      <p className="note-preview">
-        {getPreview(note.content) || "No additional text"}
-      </p>
-      <div className="note-meta">
-        <span className="note-date">{formatDate(note.updatedAt)}</span>
+}) => {
+  const TypeIcon = NOTE_TYPE_ICONS[note.type] || FileText;
+
+  // Safely get the preview text, ensuring we always get a string
+  const getPreviewText = () => {
+    try {
+      const preview = getPreview(note.content, note.type);
+      return String(preview || "No additional text");
+    } catch (error) {
+      console.warn("Error getting preview for note:", note._id, error);
+      return "No additional text";
+    }
+  };
+
+  return (
+    <div
+      className={`note-item ${isSelected ? "selected" : ""} ${
+        isKeyboardSelected ? "keyboard-selected" : ""
+      }`}
+      style={{ "--item-index": index }}
+      onClick={onSelect}
+    >
+      <div className="note-type-icon">
+        <TypeIcon size={14} />
+      </div>
+      <div className="note-content">
+        <h4 className="note-title">{String(note.title || "Untitled")}</h4>
+        <p className="note-preview">{getPreviewText()}</p>
+        <div className="note-meta">
+          <span className="note-date">{formatDate(note.updatedAt)}</span>
+        </div>
+      </div>
+      <div className="note-actions">
+        {note.isDeleted ? (
+          <>
+            <button
+              className="note-action-btn restore"
+              onClick={onRestore}
+              title="Restore note"
+              disabled={loadingStates[`restore-${note._id}`]}
+            >
+              {loadingStates[`restore-${note._id}`] ? (
+                <LoadingSpinner size={12} inline={true} showMessage={false} />
+              ) : (
+                <RotateCcw size={12} />
+              )}
+            </button>
+            <button
+              className="note-action-btn permanent-delete"
+              onClick={(e) => onPermanentDelete(note._id, e)}
+              title="Delete permanently"
+              disabled={loadingStates[`permanent-${note._id}`]}
+            >
+              {loadingStates[`permanent-${note._id}`] ? (
+                <LoadingSpinner size={12} inline={true} showMessage={false} />
+              ) : (
+                <Trash size={12} />
+              )}
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="note-action-btn delete"
+              onClick={onDelete}
+              title="Delete note"
+              disabled={loadingStates[`delete-${note._id}`]}
+            >
+              {loadingStates[`delete-${note._id}`] ? (
+                <LoadingSpinner size={12} inline={true} showMessage={false} />
+              ) : (
+                <Trash2 size={12} />
+              )}
+            </button>
+            <button
+              className={`note-action-btn pin ${note.isPinned ? "active" : ""}`}
+              onClick={onTogglePin}
+              title={note.isPinned ? "Unpin note" : "Pin note"}
+              disabled={loadingStates[`pin-${note._id}`]}
+            >
+              {loadingStates[`pin-${note._id}`] ? (
+                <LoadingSpinner size={12} inline={true} showMessage={false} />
+              ) : (
+                <Pin size={12} />
+              )}
+            </button>
+          </>
+        )}
       </div>
     </div>
-    <div className="note-actions">
-      {note.isDeleted ? (
-        <>
-          <button
-            className="note-action-btn restore"
-            onClick={onRestore}
-            title="Restore note"
-            disabled={loadingStates[`restore-${note._id}`]}
-          >
-            {loadingStates[`restore-${note._id}`] ? (
-              <LoadingSpinner size={12} inline={true} showMessage={false} />
-            ) : (
-              <RotateCcw size={12} />
-            )}
-          </button>
-          <button
-            className="note-action-btn permanent-delete"
-            onClick={(e) => onPermanentDelete(note._id, e)}
-            title="Delete permanently"
-            disabled={loadingStates[`permanent-${note._id}`]}
-          >
-            {loadingStates[`permanent-${note._id}`] ? (
-              <LoadingSpinner size={12} inline={true} showMessage={false} />
-            ) : (
-              <Trash size={12} />
-            )}
-          </button>
-        </>
-      ) : (
-        <>
-          <button
-            className="note-action-btn delete"
-            onClick={onDelete}
-            title="Delete note"
-            disabled={loadingStates[`delete-${note._id}`]}
-          >
-            {loadingStates[`delete-${note._id}`] ? (
-              <LoadingSpinner size={12} inline={true} showMessage={false} />
-            ) : (
-              <Trash2 size={12} />
-            )}
-          </button>
-          <button
-            className={`note-action-btn pin ${note.isPinned ? "active" : ""}`}
-            onClick={onTogglePin}
-            title={note.isPinned ? "Unpin note" : "Pin note"}
-            disabled={loadingStates[`pin-${note._id}`]}
-          >
-            {loadingStates[`pin-${note._id}`] ? (
-              <LoadingSpinner size={12} inline={true} showMessage={false} />
-            ) : (
-              <Pin size={12} />
-            )}
-          </button>
-        </>
-      )}
-    </div>
-  </div>
-);
+  );
+};
 
 export default NoteList;

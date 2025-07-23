@@ -1,11 +1,11 @@
-import React from "react";
+"use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Sun, Moon, User } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import "../styles/TopBar.css";
 
-const TopBar = () => {
+const TopBar = ({ headerBackgroundEnabled, onToggleHeaderBackground }) => {
   const [showComingSoon, setShowComingSoon] = useState(null);
 
   const handleComingSoon = (feature) => {
@@ -16,7 +16,10 @@ const TopBar = () => {
   return (
     <div className="top-bar">
       <ThemeToggleButton onComingSoon={() => handleComingSoon("theme")} />
-      <ColorSwitchToggle onComingSoon={() => handleComingSoon("colorSwitch")} />
+      <HeaderBackgroundToggle
+        enabled={headerBackgroundEnabled}
+        onToggle={onToggleHeaderBackground}
+      />
       <UserIcon onComingSoon={() => handleComingSoon("userPanel")} />
 
       {showComingSoon && (
@@ -42,12 +45,12 @@ const ThemeToggleButton = ({ onComingSoon }) => {
   );
 };
 
-const ColorSwitchToggle = ({ onComingSoon }) => {
+const HeaderBackgroundToggle = ({ enabled, onToggle }) => {
   return (
     <div
-      className="toggle-switch active"
-      onClick={onComingSoon}
-      title="Coming Soon"
+      className={`toggle-switch ${enabled ? "active" : "inactive"}`}
+      onClick={onToggle}
+      title={enabled ? "Disable Header Background" : "Enable Header Background"}
     >
       <div className="toggle-switch-slider"></div>
     </div>

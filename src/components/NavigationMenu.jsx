@@ -1,5 +1,4 @@
 import React from "react";
-
 import { StickyNote, Pin, Trash2 } from "lucide-react";
 
 const NavigationMenu = ({
@@ -9,6 +8,14 @@ const NavigationMenu = ({
   onDeleteAll,
   isDeleteMode,
 }) => {
+  const handleDeleteAllClick = () => {
+    if (currentView === "deleted" && counts.deleted > 0) {
+      onDeleteAll();
+    } else {
+      onViewChange("deleted");
+    }
+  };
+
   return (
     <div className="sidebar-nav">
       <div className="nav-section">
@@ -32,13 +39,21 @@ const NavigationMenu = ({
 
         <button
           className={`nav-item ${currentView === "deleted" ? "active" : ""} ${
-            isDeleteMode ? "delete-mode" : ""
+            currentView === "deleted" && counts.deleted > 0 ? "delete-mode" : ""
           }`}
-          onClick={isDeleteMode ? onDeleteAll : () => onViewChange("deleted")}
-          title={isDeleteMode ? "Delete all permanently" : "View deleted notes"}
+          onClick={handleDeleteAllClick}
+          title={
+            currentView === "deleted" && counts.deleted > 0
+              ? "Delete all permanently"
+              : "View deleted notes"
+          }
         >
           <Trash2 size={16} />
-          <span>{isDeleteMode ? "Delete All" : "Deleted"}</span>
+          <span>
+            {currentView === "deleted" && counts.deleted > 0
+              ? "Delete All"
+              : "Deleted"}
+          </span>
           <span className="nav-count">{counts.deleted}</span>
         </button>
       </div>

@@ -23,37 +23,94 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background: linear-gradient(
-    135deg,
-    #14efff,
-    #2be262,
-    #89dc14,
-    #ff2356,
-    #8a2be2
-  );
-  background-size: 300% 300%;
-  animation: gradientMove 16s ease-in-out infinite;
+  background: #181818; /* Default fallback background */
   border-bottom: 2px solid #0a0a0a;
   height: 64px;
   min-height: 64px;
   max-height: 64px;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.8s ease-in-out;
+}
+
+/* Header with background image enabled */
+.main-header.background-enabled {
+  background: #000000; /* Black fallback while loading */
+  background-image: url("/public/images/marble-header-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Lazy loading overlay for fade-in effect */
+.main-header.background-enabled::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000000;
+  opacity: 1;
+  transition: opacity 0.8s ease-in-out;
+  z-index: 1;
+}
+
+.main-header.background-enabled.image-loaded::before {
+  opacity: 0;
+}
+
+/* Fade out effect when disabling background */
+.main-header.background-disabled {
+  background: #0a0a0a;
+}
+
+.main-header.background-disabled::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0a0a0a;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  z-index: 1;
+}
+
+.main-header.background-disabled.fading-out::before {
+  opacity: 1;
+}
+
+/* Responsive background positioning for enabled backgrounds */
+@media (max-width: 1200px) {
+  .main-header.background-enabled {
+    background-size: 150% auto; /* Zoom in on smaller screens */
+    background-position: center 30%; /* Use different part of image */
+  }
+}
+
+@media (max-width: 768px) {
+  .main-header.background-enabled {
+    background-size: 200% auto; /* More zoom on mobile */
+    background-position: center 40%; /* Different crop area */
+  }
+}
+
+@media (max-width: 480px) {
+  .main-header.background-enabled {
+    background-size: 250% auto; /* Maximum zoom on very small screens */
+    background-position: center 50%; /* Center crop */
+  }
 }
 
 .header-left-actions {
   display: flex;
   gap: 8px;
   align-items: center;
-}
-
-@keyframes gradientMove {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+  position: relative;
+  z-index: 2;
 }
 
 .sidebar-toggle-btn-main {
@@ -69,19 +126,21 @@
   height: 32px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar-toggle-btn-main:hover {
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
   color: white;
 }
 
 .note-header-actions {
   display: flex;
   gap: 8px;
+  position: relative;
+  z-index: 2;
 }
 
 .note-header-btn {
@@ -97,13 +156,13 @@
   height: 32px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .note-header-btn:hover {
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
   color: white;
 }
 
@@ -114,7 +173,7 @@
 
 .note-header-btn.pin-btn.active {
   color: #fbbf24;
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .note-header-btn.pin-btn:hover {
@@ -134,13 +193,13 @@
   height: 32px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .note-header-btn.delete-btn:hover {
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
   color: rgb(197, 0, 0);
 }
 
@@ -157,13 +216,13 @@
   height: 32px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .fullscreen-toggle-btn:hover {
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
   color: white;
 }
 
@@ -178,7 +237,7 @@
 /* Formatting Toolbar - RIGHT BELOW HEADER, GRAYSCALE THEME */
 .formatting-toolbar-container {
   position: absolute;
-  top: 0; /* 1.5 times higher: 64px + (64px * 0.5) = 96px */
+  top: 0;
   left: 0;
   right: 0;
   z-index: 100;
@@ -190,7 +249,7 @@
   justify-content: flex-start;
   gap: 3px;
   padding: 8px 20px;
-  background: rgba(64, 64, 64, 0.4); /* Gray background */
+  background: rgba(64, 64, 64, 0.4);
   border-bottom: 1px solid #404040;
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
@@ -216,7 +275,7 @@
   margin: 0 8px;
 }
 
-.plain-text-indicator {
+.editor-mode-indicator {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -234,7 +293,7 @@
   height: 30px;
   border: none;
   background: transparent;
-  color: #a0a0a0; /* Light gray */
+  color: #a0a0a0;
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -243,34 +302,34 @@
 }
 
 .format-btn:hover {
-  background: rgba(160, 160, 160, 0.15); /* Light gray hover */
+  background: rgba(160, 160, 160, 0.15);
   color: #ffffff;
   border-color: rgba(160, 160, 160, 0.3);
   transform: translateY(-1px);
 }
 
 .format-btn.active {
-  background: rgba(255, 255, 255, 0.2); /* White active background */
+  background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.4);
 }
 
 /* Grayscale theme for different button types */
 .format-btn.smart.active {
-  background: rgba(128, 128, 128, 0.3); /* Medium gray */
+  background: rgba(128, 128, 128, 0.3);
   color: #ffffff;
   border-color: rgba(160, 160, 160, 0.5);
 }
 
 .format-btn.list.active {
-  background: rgba(96, 96, 96, 0.3); /* Darker gray */
+  background: rgba(96, 96, 96, 0.3);
   color: #ffffff;
   border-color: rgba(128, 128, 128, 0.5);
 }
 
 .format-btn.toggle.active {
-  background: rgba(192, 192, 192, 0.3); /* Lighter gray */
-  color: #000000; /* Black text for contrast */
+  background: rgba(192, 192, 192, 0.3);
+  color: #000000;
   border-color: rgba(192, 192, 192, 0.6);
 }
 
@@ -285,7 +344,7 @@
   bottom: -30px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(32, 32, 32, 0.95); /* Dark gray tooltip */
+  background: rgba(32, 32, 32, 0.95);
   color: #e0e0e0;
   padding: 4px 8px;
   border-radius: 4px;
@@ -316,10 +375,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 16px;
-  background: rgba(64, 64, 64, 0.25); /* Gray background */
+  background: rgba(64, 64, 64, 0.25);
   border-top: 1px solid #404040;
   font-size: 10px;
-  color: #a0a0a0; /* Light gray text */
+  color: #a0a0a0;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   height: 28px;
@@ -373,7 +432,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 60px 32px 28px 32px; /* Increased top padding for toolbar */
+  padding: 60px 32px 28px 32px;
   max-width: 95%;
   margin: 0 auto;
   width: 100%;
@@ -385,7 +444,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 16px; /* Increased margin to move title down */
+  margin-bottom: 16px;
   padding-bottom: 22px;
   border-bottom: 1px solid #2a2a2a;
   flex-shrink: 0;
@@ -446,14 +505,12 @@
   line-height: 1.8;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     sans-serif;
-  padding: 16px 0; /* Reduced top padding to move text area up */
+  padding: 16px 0;
   transition: all 0.3s ease;
   overflow-y: auto;
   overflow-x: hidden;
   word-wrap: break-word;
   white-space: pre-wrap;
-
-  /* Custom scrollbar */
   scrollbar-width: thin;
   scrollbar-color: #404040 transparent;
 }
@@ -475,8 +532,6 @@
   resize: none;
   word-wrap: break-word;
   white-space: pre-wrap;
-
-  /* Custom scrollbar */
   scrollbar-width: thin;
   scrollbar-color: #404040 transparent;
 }
@@ -523,7 +578,7 @@
   color: #64748b;
   pointer-events: none;
   position: absolute;
-  top: 16px; /* Adjusted for new padding */
+  top: 16px;
   left: 0;
 }
 
@@ -608,6 +663,10 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .note-header {
+    margin-top: 20px;
+  }
+
   .main-content {
     margin: 44px 8px 8px 8px;
     border-radius: 8px;
@@ -637,6 +696,7 @@
   }
 
   .note-title-input {
+    top: 1000px;
     font-size: 28px;
   }
 
@@ -655,6 +715,10 @@
 }
 
 @media (max-width: 480px) {
+  .note-header {
+    margin-top: 20px;
+  }
+
   .note-editor {
     padding: 40px 20px 28px 20px;
     max-width: 100%;

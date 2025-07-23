@@ -1,6 +1,6 @@
-import React from "react";
+"use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import TopBar from "./components/TopBar";
 import Sidebar from "./components/Sidebar";
@@ -21,6 +21,7 @@ function AppContent() {
   const [backendConnected, setBackendConnected] = useState(false);
   const [isTransitioningFullscreen, setIsTransitioningFullscreen] =
     useState(false);
+  const [headerBackgroundEnabled, setHeaderBackgroundEnabled] = useState(true);
 
   const {
     notes,
@@ -29,6 +30,7 @@ function AppContent() {
     counts,
     loading,
     error,
+    createError,
     clearError,
     loadNotes,
     createNote,
@@ -119,6 +121,10 @@ function AppContent() {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
+  const handleToggleHeaderBackground = () => {
+    setHeaderBackgroundEnabled(!headerBackgroundEnabled);
+  };
+
   if (initialLoading) {
     return (
       <div className="app">
@@ -131,11 +137,14 @@ function AppContent() {
 
   return (
     <div className={`app ${isFullscreen ? "fullscreen-mode" : ""}`}>
-      <TopBar />
+      <TopBar
+        headerBackgroundEnabled={headerBackgroundEnabled}
+        onToggleHeaderBackground={handleToggleHeaderBackground}
+      />
 
-      {error && (
+      {(error || createError) && (
         <ErrorMessage
-          message={error}
+          message={error || createError}
           onDismiss={clearError}
           onRetry={() => loadNotes(currentView, searchTerm)}
         />
@@ -171,6 +180,7 @@ function AppContent() {
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
         isTransitioningFullscreen={isTransitioningFullscreen}
+        headerBackgroundEnabled={headerBackgroundEnabled}
       />
 
       <GlassmorphicFAB
