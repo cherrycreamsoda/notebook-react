@@ -36,15 +36,64 @@
 
 /* Header with background image enabled */
 .main-header.background-enabled {
-  background: #000000; /* Black fallback while loading */
+  background: #181818; /* Fallback while loading */
+}
+
+.main-header.background-enabled::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: url("/public/images/marble-header-bg.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  z-index: 0;
+}
+
+.main-header.background-enabled.image-loaded::after {
+  opacity: 1;
+}
+
+/* Header with background disabled - show color background */
+.main-header.background-disabled {
+  border-bottom: none;
+  background: #181818;
+}
+
+.main-header.background-disabled::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("/public/images/marble-header-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  z-index: 0;
+}
+
+.main-header.background-disabled.fading-out::after {
+  opacity: 0;
+}
+
+/* Ensure header content stays above background */
+.header-left-actions,
+.note-header-actions {
+  position: relative;
+  z-index: 2;
 }
 
 /* Lazy loading overlay for fade-in effect */
-.main-header.background-enabled::before {
+/*.main-header.background-enabled::before {
   content: "";
   position: absolute;
   top: 0;
@@ -62,7 +111,7 @@
 }
 
 /* Fade out effect when disabling background */
-.main-header.background-disabled {
+/*.main-header.background-disabled {
   background: #0a0a0a;
 }
 
@@ -81,7 +130,7 @@
 
 .main-header.background-disabled.fading-out::before {
   opacity: 1;
-}
+}*/
 
 /* Responsive background positioning for enabled backgrounds */
 @media (max-width: 1200px) {

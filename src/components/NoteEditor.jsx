@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Bold,
@@ -389,27 +391,40 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
   const handleTypeChange = async (newType) => {
     if (!selectedNote || selectedNote.type === newType) return;
 
-    // Always clear content before changing type to avoid type errors
-    // First update to empty content, then change type
-    await handleUpdate("content", "");
+    // Check if note has content that would be lost
+    const hasContent = () => {
+      if (!selectedNote.content) return false;
 
-    // Set default content based on new type
-    let newContent = "";
-    if (newType === "CHECKLIST") {
-      newContent = {
-        items: [{ id: Date.now().toString(), text: "", checked: false }],
-      };
+      if (typeof selectedNote.content === "string") {
+        return selectedNote.content.trim().length > 0;
+      }
+
+      if (typeof selectedNote.content === "object") {
+        if (
+          selectedNote.content.items &&
+          Array.isArray(selectedNote.content.items)
+        ) {
+          return selectedNote.content.items.some(
+            (item) => item.text && item.text.trim().length > 0
+          );
+        }
+      }
+
+      return false;
+    };
+
+    // Show warning if note has content
+    if (hasContent()) {
+      setTypeChangeConfirmation({
+        newType,
+        title: "Change Note Type?",
+        message:
+          "Changing the note type will clear all current content. This action cannot be undone.",
+      });
     } else {
-      newContent = "";
+      // No content, proceed directly
+      await performTypeChange(newType);
     }
-
-    // Update the note type and content
-    await handleUpdate("type", newType);
-    await handleUpdate("content", newContent);
-
-    // Trigger blink effect
-    setShouldBlinkDropdown(true);
-    setTimeout(() => setShouldBlinkDropdown(false), 1000);
   };
 
   const performTypeChange = async (newType) => {

@@ -47,7 +47,7 @@ const MainContent = ({
     img.onerror = () => {
       console.warn("Header background image failed to load");
     };
-    img.src = "/images/marble-header-bg.jpg";
+    img.src = "images/marble-header-bg.jpg";
   }, [headerBackgroundEnabled]);
 
   // Handle background disable animation
@@ -55,13 +55,15 @@ const MainContent = ({
     const header = headerRef.current;
     if (!header) return;
 
-    if (!headerBackgroundEnabled && imageLoaded) {
-      setIsDisabling(true);
-      // Reset after animation completes
-      setTimeout(() => {
-        setIsDisabling(false);
-        setImageLoaded(false);
-      }, 800);
+    if (!headerBackgroundEnabled) {
+      if (imageLoaded) {
+        setIsDisabling(true);
+        // Reset after animation completes
+        setTimeout(() => {
+          setIsDisabling(false);
+          setImageLoaded(false);
+        }, 800);
+      }
     }
   }, [headerBackgroundEnabled, imageLoaded]);
 
@@ -229,7 +231,5 @@ const MainHeader = React.forwardRef(
     </div>
   )
 );
-
-MainHeader.displayName = "MainHeader";
 
 export default MainContent;

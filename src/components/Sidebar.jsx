@@ -1,6 +1,6 @@
-import React from "react";
+"use client";
 import { Plus, Github, PanelLeftClose } from "lucide-react";
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import "../styles/Sidebar.css";
 import SearchBar from "./SearchBar";
 import NavigationMenu from "./NavigationMenu";
@@ -97,7 +97,8 @@ const Sidebar = ({
               <Plus size={16} />
             </button>
 
-            {isFullscreen && (
+            {/* Show close button in fullscreen mode OR mobile view */}
+            {(isFullscreen || window.innerWidth <= 768) && (
               <button
                 className="header-action-btn sidebar-close-btn"
                 onClick={onToggleCollapse}

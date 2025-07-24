@@ -39,6 +39,17 @@
   padding: 0 6px;
 }
 
+/* Make the icon bigger */
+.dropdown-trigger svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.dropdown-trigger .chevron {
+  width: 12px !important;
+  height: 12px !important;
+}
+
 .dropdown-trigger:hover {
   background: rgba(160, 160, 160, 0.15);
   color: #ffffff;
