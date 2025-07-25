@@ -16,7 +16,7 @@
   border-radius: 8px;
   overflow: hidden;
   background: #1a1a1a;
-  min-height: 400px;
+  min-height: 0; /* Important for flex children */
   margin: 8px;
 }
 
@@ -61,11 +61,12 @@
   text-overflow: ellipsis;
 }
 
-/* Body */
+/* Body - FIXED SCROLLING */
 .datasheet-body {
   flex: 1;
-  overflow: auto;
-  min-height: 0;
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: auto; /* Enable horizontal scrolling if needed */
+  min-height: 0; /* Important for flex children */
 }
 
 .datasheet-row-container {
@@ -360,23 +361,27 @@
   border-color: #10b981;
 }
 
-/* Custom scrollbar for datasheet body */
+/* FIXED SCROLLBAR for datasheet body */
 .datasheet-body::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 .datasheet-body::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: rgba(42, 42, 42, 0.1);
+  border-radius: 6px;
 }
 
 .datasheet-body::-webkit-scrollbar-thumb {
   background: #404040;
-  border-radius: 4px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 .datasheet-body::-webkit-scrollbar-thumb:hover {
   background: #4b5563;
+  background-clip: content-box;
 }
 
 .datasheet-body::-webkit-scrollbar-corner {

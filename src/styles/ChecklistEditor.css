@@ -4,7 +4,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0;
+  padding: 16px 32px; /* Add horizontal padding */
+  overflow: hidden; /* Prevent the editor itself from scrolling */
 }
 
 .checklist-items {
@@ -12,7 +13,10 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  overflow-y: auto;
+  overflow-y: auto; /* Enable scrolling for items */
+  overflow-x: hidden;
+  min-height: 0; /* Important for flex children */
+  padding-right: 8px; /* Space for scrollbar */
 }
 
 .checklist-item {
@@ -24,6 +28,7 @@
   transition: all 0.2s ease;
   cursor: move;
   position: relative;
+  flex-shrink: 0; /* Prevent items from shrinking */
 }
 
 .checklist-item:last-child {
@@ -167,16 +172,17 @@
 
 /* Custom scrollbar for checklist items */
 .checklist-items::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .checklist-items::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(42, 42, 42, 0.1);
+  border-radius: 4px;
 }
 
 .checklist-items::-webkit-scrollbar-thumb {
   background: #404040;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .checklist-items::-webkit-scrollbar-thumb:hover {
@@ -185,6 +191,10 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .checklist-editor {
+    padding: 16px 24px;
+  }
+
   .checklist-item {
     gap: 8px;
     padding: 10px 0;
@@ -211,6 +221,7 @@
 
 @media (max-width: 480px) {
   .checklist-editor {
+    padding: 16px 20px;
     gap: 12px;
   }
 

@@ -1,12 +1,19 @@
-"use client"
+"use client";
 
-import React, { useEffect, useRef, useState } from "react"
-import { PanelLeftOpen, PanelLeftClose, Pin, Trash2, Maximize, Minimize } from "lucide-react"
-import LoadingSpinner from "./LoadingSpinner"
-import NoteEditor from "./NoteEditor"
+import React, { useEffect, useRef, useState } from "react";
+import {
+  PanelLeftOpen,
+  PanelLeftClose,
+  Pin,
+  Trash2,
+  Maximize,
+  Minimize,
+} from "lucide-react";
+import LoadingSpinner from "./LoadingSpinner";
+import EditorContainer from "./editors/EditorContainer";
 
-import { useAsyncAction } from "../hooks/useAsyncAction"
-import "../styles/MainContent.css"
+import { useAsyncAction } from "../hooks/useAsyncAction";
+import "../styles/MainContent.css";
 
 const MainContent = ({
   selectedNote,
@@ -20,79 +27,83 @@ const MainContent = ({
   isTransitioningFullscreen,
   headerBackgroundEnabled,
 }) => {
-  const { loading: pinLoading, execute: executePin } = useAsyncAction()
-  const { loading: deleteLoading, execute: executeDelete } = useAsyncAction()
-  const headerRef = useRef(null)
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [isDisabling, setIsDisabling] = useState(false)
-  const [isDatasheet, setIsDatasheet] = useState(false)
+  const { loading: pinLoading, execute: executePin } = useAsyncAction();
+  const { loading: deleteLoading, execute: executeDelete } = useAsyncAction();
+  const headerRef = useRef(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isDisabling, setIsDisabling] = useState(false);
 
   // Handle image lazy loading with fade-in effect
   useEffect(() => {
-    const header = headerRef.current
-    if (!header || !headerBackgroundEnabled) return
+    const header = headerRef.current;
+    if (!header || !headerBackgroundEnabled) return;
 
-    setImageLoaded(false)
-    const img = new Image()
-    img.crossOrigin = "anonymous"
+    setImageLoaded(false);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
     img.onload = () => {
-      setImageLoaded(true)
-    }
+      setImageLoaded(true);
+    };
     img.onerror = () => {
-      console.warn("Header background image failed to load")
-    }
-    img.src = "images/marble-header-bg.jpg"
-  }, [headerBackgroundEnabled])
+      console.warn("Header background image failed to load");
+    };
+    img.src = "images/marble-header-bg.jpg";
+  }, [headerBackgroundEnabled]);
 
   // Handle background disable animation
   useEffect(() => {
-    const header = headerRef.current
-    if (!header) return
+    const header = headerRef.current;
+    if (!header) return;
 
     if (!headerBackgroundEnabled) {
       if (imageLoaded) {
-        setIsDisabling(true)
+        setIsDisabling(true);
         // Reset after animation completes
         setTimeout(() => {
-          setIsDisabling(false)
-          setImageLoaded(false)
-        }, 800)
+          setIsDisabling(false);
+          setImageLoaded(false);
+        }, 800);
       }
     }
-  }, [headerBackgroundEnabled, imageLoaded])
+  }, [headerBackgroundEnabled, imageLoaded]);
 
   const handleTogglePin = () => {
-    if (!selectedNote) return
-    executePin(() => onTogglePin(selectedNote._id), "Failed to toggle pin")
-  }
+    if (!selectedNote) return;
+    executePin(() => onTogglePin(selectedNote._id), "Failed to toggle pin");
+  };
 
   const handleDelete = () => {
-    if (!selectedNote) return
-    executeDelete(() => onDeleteNote(selectedNote._id), "Failed to delete note")
-  }
+    if (!selectedNote) return;
+    executeDelete(
+      () => onDeleteNote(selectedNote._id),
+      "Failed to delete note"
+    );
+  };
 
   const getHeaderClasses = () => {
-    let classes = "main-header"
+    let classes = "main-header";
 
     if (headerBackgroundEnabled) {
-      classes += " background-enabled"
+      classes += " background-enabled";
       if (imageLoaded) {
-        classes += " image-loaded"
+        classes += " image-loaded";
       }
     } else {
-      classes += " background-disabled"
+      classes += " background-disabled";
       if (isDisabling) {
-        classes += " fading-out"
+        classes += " fading-out";
       }
     }
 
-    return classes
-  }
+    return classes;
+  };
 
   if (!selectedNote) {
     return (
       <div
-        className={`main-content ${sidebarCollapsed ? "sidebar-collapsed" : ""} ${isFullscreen ? "fullscreen" : ""}`}
+        className={`main-content ${
+          sidebarCollapsed ? "sidebar-collapsed" : ""
+        } ${isFullscreen ? "fullscreen" : ""}`}
       >
         <MainHeader
           ref={headerRef}
@@ -109,11 +120,15 @@ const MainContent = ({
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={`main-content ${sidebarCollapsed ? "sidebar-collapsed" : ""} ${isFullscreen ? "fullscreen" : ""}`}>
+    <div
+      className={`main-content ${sidebarCollapsed ? "sidebar-collapsed" : ""} ${
+        isFullscreen ? "fullscreen" : ""
+      }`}
+    >
       <MainHeader
         ref={headerRef}
         className={getHeaderClasses()}
@@ -130,23 +145,14 @@ const MainContent = ({
       />
 
       <div className="main-content-inner">
-        <div
-          className={`note-editor ${
-            isDatasheet
-              ? "datasheet-mode"
-              : selectedNote?.type === "CHECKLIST"
-                ? "checklist-mode"
-                : selectedNote?.type === "REMINDERS"
-                  ? "reminders-mode"
-                  : ""
-          }`}
-        >
-          <NoteEditor selectedNote={selectedNote} onUpdateNote={onUpdateNote} />
-        </div>
+        <EditorContainer
+          selectedNote={selectedNote}
+          onUpdateNote={onUpdateNote}
+        />
       </div>
     </div>
-  )
-}
+  );
+};
 
 const MainHeader = React.forwardRef(
   (
@@ -163,7 +169,7 @@ const MainHeader = React.forwardRef(
       pinLoading,
       deleteLoading,
     },
-    ref,
+    ref
   ) => (
     <div className={className} ref={ref}>
       <div className="header-left-actions">
@@ -172,7 +178,11 @@ const MainHeader = React.forwardRef(
           onClick={onToggleSidebar}
           title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
-          {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          {sidebarCollapsed ? (
+            <PanelLeftOpen size={16} />
+          ) : (
+            <PanelLeftClose size={16} />
+          )}
         </button>
         <button
           className="fullscreen-toggle-btn"
@@ -193,12 +203,18 @@ const MainHeader = React.forwardRef(
       {selectedNote && (
         <div className="note-header-actions">
           <button
-            className={`note-header-btn pin-btn ${selectedNote.isPinned ? "active" : ""}`}
+            className={`note-header-btn pin-btn ${
+              selectedNote.isPinned ? "active" : ""
+            }`}
             onClick={onTogglePin}
             title={selectedNote.isPinned ? "Unpin note" : "Pin note"}
             disabled={pinLoading}
           >
-            {pinLoading ? <LoadingSpinner size={14} inline={true} showMessage={false} /> : <Pin size={14} />}
+            {pinLoading ? (
+              <LoadingSpinner size={14} inline={true} showMessage={false} />
+            ) : (
+              <Pin size={14} />
+            )}
           </button>
 
           <button
@@ -207,12 +223,16 @@ const MainHeader = React.forwardRef(
             title="Delete note"
             disabled={deleteLoading}
           >
-            {deleteLoading ? <LoadingSpinner size={14} inline={true} showMessage={false} /> : <Trash2 size={14} />}
+            {deleteLoading ? (
+              <LoadingSpinner size={14} inline={true} showMessage={false} />
+            ) : (
+              <Trash2 size={14} />
+            )}
           </button>
         </div>
       )}
     </div>
-  ),
-)
+  )
+);
 
-export default MainContent
+export default MainContent;

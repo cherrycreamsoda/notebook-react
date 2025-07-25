@@ -235,23 +235,17 @@
   color: white;
 }
 
+/* COMPLETELY NEW LAYOUT STRUCTURE - NO MORE ABSOLUTE POSITIONING */
 .main-content-inner {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0; /* Important for flex children */
   overflow: hidden;
-  position: relative;
 }
 
-/* Formatting Toolbar - RIGHT BELOW HEADER, GRAYSCALE THEME */
-.formatting-toolbar-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-}
-
+/* Formatting Toolbar - NOW A PROPER FLEX ITEM */
 .formatting-toolbar {
   display: flex;
   align-items: center;
@@ -263,6 +257,9 @@
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  flex-shrink: 0; /* Don't shrink */
   animation: slideInFromTop 0.4s ease-out;
 }
 
@@ -370,15 +367,16 @@
   opacity: 1;
 }
 
-/* Word Count Bar - Attached to bottom */
-.editor-status-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
+/* EDITOR CONTENT AREA - TAKES REMAINING SPACE */
+.editor-content-area {
+  flex: 1; /* Take all remaining space */
+  overflow: hidden; /* Constrain content */
+  min-height: 0; /* Important for flex children */
+  display: flex;
+  flex-direction: column;
 }
 
+/* Word Count Bar - NOW A PROPER FLEX ITEM */
 .editor-status {
   display: flex;
   justify-content: space-between;
@@ -391,6 +389,9 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   height: 28px;
+  min-height: 28px;
+  max-height: 28px;
+  flex-shrink: 0; /* Don't shrink */
 }
 
 .word-count,
@@ -437,22 +438,20 @@
   }
 }
 
+/* NOTE EDITOR - FILLS THE EDITOR CONTENT AREA */
 .note-editor {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 60px 32px 28px 32px;
-  max-width: 95%;
-  margin: 0 auto;
   width: 100%;
   height: 100%;
   overflow: hidden;
+  min-height: 0; /* Important for flex children */
 }
 
 /* Datasheet mode - full width with zero left/right padding */
 .note-editor.datasheet-mode {
-  padding: 60px 0px 28px 0px;
-  max-width: 100%;
+  /* No special padding needed */
 }
 
 .note-header {
@@ -460,7 +459,7 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 16px;
-  padding-bottom: 22px;
+  padding: 16px 32px 22px 32px;
   border-bottom: 1px solid #2a2a2a;
   flex-shrink: 0;
 }
@@ -505,20 +504,17 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 0;
-}
-
-.editor-container.full-height {
-  padding-top: 40px;
-  padding-bottom: 28px;
+  min-height: 0; /* Important for flex children */
 }
 
 .content-wrapper {
   flex: 1;
   overflow: hidden;
   position: relative;
+  min-height: 0; /* Important for flex children */
 }
 
+/* RICH TEXT EDITOR SCROLLING */
 .note-content-input {
   width: 100%;
   height: 100%;
@@ -529,10 +525,11 @@
   font-size: 18px;
   color: #f1f5f9;
   line-height: 1.8;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
-  padding: 16px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    sans-serif;
+  padding: 16px 32px; /* Horizontal padding for rich text */
   transition: all 0.3s ease;
-  overflow-y: auto;
+  overflow-y: auto; /* Enable vertical scrolling */
   overflow-x: hidden;
   word-wrap: break-word;
   white-space: pre-wrap;
@@ -540,6 +537,7 @@
   scrollbar-color: #404040 transparent;
 }
 
+/* PLAIN TEXT EDITOR SCROLLING AND SIZING */
 .note-content-textarea {
   width: 100%;
   height: 100%;
@@ -550,12 +548,14 @@
   font-size: 18px;
   color: #f1f5f9;
   line-height: 1.8;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
-  padding: 16px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    sans-serif;
+  padding: 40px 32px 30px 32px; /* Specified padding */
   transition: all 0.3s ease;
   resize: none;
   word-wrap: break-word;
   white-space: pre-wrap;
+  overflow-y: auto; /* Enable vertical scrolling */
   scrollbar-width: thin;
   scrollbar-color: #404040 transparent;
 }
@@ -603,7 +603,7 @@
   pointer-events: none;
   position: absolute;
   top: 16px;
-  left: 0;
+  left: 32px;
 }
 
 .note-content-textarea::placeholder {
@@ -688,7 +688,7 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .note-header {
-    margin-top: 20px;
+    padding: 16px 24px 22px 24px;
   }
 
   .main-content {
@@ -696,14 +696,12 @@
     border-radius: 8px;
   }
 
-  .note-editor {
-    padding: 40px 24px 28px 24px;
-    max-width: 98%;
+  .note-content-input {
+    padding: 16px 24px;
   }
 
-  .note-editor.datasheet-mode {
-    padding: 40px 0px 28px 0px;
-    max-width: 100%;
+  .note-content-textarea {
+    padding: 40px 24px 30px 24px;
   }
 
   .note-editor.datasheet-mode .note-header {
@@ -730,7 +728,6 @@
   }
 
   .note-title-input {
-    top: 1000px;
     font-size: 28px;
   }
 
@@ -750,17 +747,15 @@
 
 @media (max-width: 480px) {
   .note-header {
-    margin-top: 20px;
+    padding: 16px 20px 22px 20px;
   }
 
-  .note-editor {
-    padding: 40px 20px 28px 20px;
-    max-width: 100%;
+  .note-content-input {
+    padding: 16px 20px;
   }
 
-  .note-editor.datasheet-mode {
-    padding: 40px 0px 28px 0px;
-    max-width: 100%;
+  .note-content-textarea {
+    padding: 40px 20px 30px 20px;
   }
 
   .note-editor.datasheet-mode .note-header {
@@ -813,20 +808,4 @@
   outline: none !important;
   box-shadow: none !important;
   border: none !important;
-}
-
-/* Special editors - full width with zero left/right padding */
-.note-editor.datasheet-mode,
-.note-editor.checklist-mode,
-.note-editor.reminders-mode {
-  padding: 40px 0px 28px 0px;
-  max-width: 100%;
-}
-
-/* Restore horizontal padding for title in special modes (when title is shown) */
-.note-editor.datasheet-mode .note-header,
-.note-editor.checklist-mode .note-header,
-.note-editor.reminders-mode .note-header {
-  padding-left: 32px;
-  padding-right: 32px;
 }
