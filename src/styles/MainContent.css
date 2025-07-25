@@ -92,46 +92,6 @@
   z-index: 2;
 }
 
-/* Lazy loading overlay for fade-in effect */
-/*.main-header.background-enabled::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #000000;
-  opacity: 1;
-  transition: opacity 0.8s ease-in-out;
-  z-index: 1;
-}
-
-.main-header.background-enabled.image-loaded::before {
-  opacity: 0;
-}
-
-/* Fade out effect when disabling background */
-/*.main-header.background-disabled {
-  background: #0a0a0a;
-}
-
-.main-header.background-disabled::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #0a0a0a;
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out;
-  z-index: 1;
-}
-
-.main-header.background-disabled.fading-out::before {
-  opacity: 1;
-}*/
-
 /* Responsive background positioning for enabled backgrounds */
 @media (max-width: 1200px) {
   .main-header.background-enabled {
@@ -489,6 +449,12 @@
   overflow: hidden;
 }
 
+/* Datasheet mode - full width with zero left/right padding */
+.note-editor.datasheet-mode {
+  padding: 60px 0px 28px 0px;
+  max-width: 100%;
+}
+
 .note-header {
   display: flex;
   align-items: center;
@@ -497,6 +463,12 @@
   padding-bottom: 22px;
   border-bottom: 1px solid #2a2a2a;
   flex-shrink: 0;
+}
+
+/* Datasheet mode header - restore horizontal padding for title */
+.note-editor.datasheet-mode .note-header {
+  padding-left: 32px;
+  padding-right: 32px;
 }
 
 .note-title-input {
@@ -536,6 +508,11 @@
   min-height: 0;
 }
 
+.editor-container.full-height {
+  padding-top: 40px;
+  padding-bottom: 28px;
+}
+
 .content-wrapper {
   flex: 1;
   overflow: hidden;
@@ -552,8 +529,7 @@
   font-size: 18px;
   color: #f1f5f9;
   line-height: 1.8;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
   padding: 16px 0;
   transition: all 0.3s ease;
   overflow-y: auto;
@@ -574,8 +550,7 @@
   font-size: 18px;
   color: #f1f5f9;
   line-height: 1.8;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
   padding: 16px 0;
   transition: all 0.3s ease;
   resize: none;
@@ -726,6 +701,16 @@
     max-width: 98%;
   }
 
+  .note-editor.datasheet-mode {
+    padding: 40px 0px 28px 0px;
+    max-width: 100%;
+  }
+
+  .note-editor.datasheet-mode .note-header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
   .formatting-toolbar {
     padding: 8px 16px;
     gap: 2px;
@@ -773,6 +758,16 @@
     max-width: 100%;
   }
 
+  .note-editor.datasheet-mode {
+    padding: 40px 0px 28px 0px;
+    max-width: 100%;
+  }
+
+  .note-editor.datasheet-mode .note-header {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   .formatting-toolbar {
     padding: 8px 12px;
     height: 36px;
@@ -818,4 +813,20 @@
   outline: none !important;
   box-shadow: none !important;
   border: none !important;
+}
+
+/* Special editors - full width with zero left/right padding */
+.note-editor.datasheet-mode,
+.note-editor.checklist-mode,
+.note-editor.reminders-mode {
+  padding: 40px 0px 28px 0px;
+  max-width: 100%;
+}
+
+/* Restore horizontal padding for title in special modes (when title is shown) */
+.note-editor.datasheet-mode .note-header,
+.note-editor.checklist-mode .note-header,
+.note-editor.reminders-mode .note-header {
+  padding-left: 32px;
+  padding-right: 32px;
 }

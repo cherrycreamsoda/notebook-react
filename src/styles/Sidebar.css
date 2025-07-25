@@ -447,8 +447,7 @@
   transition: all 0.2s ease;
   position: relative;
   border: 1px solid transparent;
-  animation: slideInFromLeft 0.4s ease-out
-    calc(0.4s + var(--item-index, 0) * 0.05s) both;
+  animation: slideInFromLeft 0.4s ease-out calc(0.4s + var(--item-index, 0) * 0.05s) both;
 }
 
 .note-item:hover {
@@ -667,5 +666,65 @@
   /* Ensure close button shows in mobile */
   .sidebar-close-btn {
     display: flex !important;
+  }
+
+  /* Enhanced mobile note action buttons */
+  .note-actions {
+    opacity: 1; /* Always visible on mobile */
+    gap: 6px;
+  }
+
+  .note-action-btn {
+    width: 32px; /* Bigger buttons */
+    height: 32px;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.1); /* Always show background */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px; /* Less rounded for easier touch */
+  }
+
+  .note-action-btn:hover,
+  .note-action-btn:active {
+    transform: scale(1.05);
+  }
+
+  /* Enhanced mobile-specific hover states */
+  .note-action-btn.pin {
+    color: #fbbf24;
+    background-color: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.3);
+  }
+
+  .note-action-btn.pin.active {
+    color: #fbbf24 !important;
+    background-color: rgba(251, 191, 36, 0.25) !important;
+    border-color: rgba(251, 191, 36, 0.5) !important;
+  }
+
+  .note-action-btn.delete {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .note-action-btn.restore {
+    color: #10b981;
+    background-color: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  .note-action-btn.permanent-delete {
+    color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.3);
+  }
+}
+
+/* Even more enhanced for very small screens */
+@media (max-width: 480px) {
+  .note-action-btn {
+    width: 36px; /* Even bigger on small screens */
+    height: 36px;
+    padding: 10px;
   }
 }

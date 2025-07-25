@@ -59,12 +59,13 @@
   cursor: grabbing;
 }
 
+/* Replace the entire checkbox styling section */
 .item-checkbox {
   width: 20px;
   height: 20px;
   border: 2px solid #9ca3af;
   border-radius: 4px;
-  background: white;
+  background: #000000; /* Always black background */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -78,36 +79,6 @@
   border-color: #d1d5db;
 }
 
-/* Unchecked state - white box with gray border */
-.item-checkbox:not(.checked) {
-  background: white;
-  border-color: #9ca3af;
-}
-
-/* Unchecked hover - show black checkmark temporarily */
-.item-checkbox:not(.checked):hover {
-  border-color: #6b7280;
-}
-
-.item-checkbox:not(.checked):hover .checkbox-tick {
-  opacity: 1;
-}
-
-/* Checked state - black box with white checkmark */
-.item-checkbox.checked {
-  background: #1f2937;
-  border-color: #1f2937;
-}
-
-.item-checkbox.checked .checkbox-tick {
-  opacity: 1;
-}
-
-/* Checked hover - hide checkmark temporarily (show empty black box) */
-.item-checkbox.checked:hover .checkbox-tick {
-  opacity: 0;
-}
-
 .checkbox-tick {
   width: 10px;
   height: 10px;
@@ -119,17 +90,18 @@
   justify-content: center;
 }
 
+/* Show white checkmark when checked */
+.item-checkbox.checked .checkbox-tick {
+  opacity: 1;
+}
+
 /* Create proper checkmark using CSS */
 .checkbox-tick::before {
   content: "✓";
   font-size: 12px;
   font-weight: bold;
   line-height: 1;
-  color: #1f2937; /* Black for unchecked hover */
-}
-
-.item-checkbox.checked .checkbox-tick::before {
-  color: white; /* White for checked state */
+  color: white; /* Always white checkmark */
 }
 
 .item-input {

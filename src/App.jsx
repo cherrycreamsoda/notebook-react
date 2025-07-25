@@ -69,8 +69,8 @@ function AppContent() {
     }
   }, [isFullscreen]);
 
-  const handleCreateNote = async () => {
-    const result = await createNote();
+  const handleCreateNote = async (noteData = {}) => {
+    const result = await createNote(noteData); // Pass noteData here
     if (result && currentView !== "notes") {
       setCurrentView("notes");
     }

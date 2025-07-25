@@ -1,4 +1,5 @@
 "use client";
+
 import { Plus, Github, PanelLeftClose } from "lucide-react";
 import React, { useRef, useState } from "react";
 import "../styles/Sidebar.css";
@@ -31,13 +32,22 @@ const Sidebar = ({
   const { loading: createLoading, execute } = useAsyncAction();
   const [deleteAllConfirmation, setDeleteAllConfirmation] = useState(null);
 
-  const handleCreateNote = () => {
-    execute(onCreateNote, "Failed to create note");
+  const handleCreateNote = async () => {
+    try {
+      await execute(async () => {
+        await onCreateNote({
+          type: "TEXT",
+          title: "New Note",
+          content: "",
+        });
+      }, "Failed to create note");
+    } catch (error) {
+      console.error("Create note error:", error);
+    }
   };
 
   const handleDeleteAllClick = () => {
     if (currentView === "deleted" && counts.deleted > 0) {
-      // Show confirmation dialog
       setDeleteAllConfirmation({
         message: `Permanently delete all ${counts.deleted} deleted notes? This action cannot be undone.`,
         title: "Delete All Notes?",
@@ -53,7 +63,6 @@ const Sidebar = ({
       await execute(onClearAllDeleted, "Failed to clear deleted notes");
       setDeleteAllConfirmation(null);
     } catch (error) {
-      // Error is already handled by useAsyncAction
       setDeleteAllConfirmation(null);
     }
   };
@@ -90,14 +99,13 @@ const Sidebar = ({
           <div className="sidebar-header-actions">
             <button
               className="header-action-btn"
-              onClick={handleCreateNote}
+              onClick={() => handleCreateNote()}
               title="Create new note"
               disabled={createLoading}
             >
               <Plus size={16} />
             </button>
 
-            {/* Show close button in fullscreen mode OR mobile view */}
             {(isFullscreen || window.innerWidth <= 768) && (
               <button
                 className="header-action-btn sidebar-close-btn"
@@ -135,14 +143,19 @@ const Sidebar = ({
             onPermanentDelete={onPermanentDelete}
             onRestoreNote={onRestoreNote}
             onTogglePin={onTogglePin}
-            onCreateNote={handleCreateNote}
+            onCreateNote={() =>
+              onCreateNote({
+                type: "TEXT",
+                title: "New Note",
+                content: "",
+              })
+            }
             searchTerm={searchTerm}
             onSearchClear={() => onSearchChange("")}
           />
         </div>
       </div>
 
-      {/* Delete All Confirmation Dialog */}
       {deleteAllConfirmation && (
         <ConfirmationDialog
           title={deleteAllConfirmation.title}

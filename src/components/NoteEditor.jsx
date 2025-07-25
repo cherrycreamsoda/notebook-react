@@ -14,6 +14,8 @@ import { useDebounce } from "../hooks/useDebounce";
 import NoteTypeDropdown from "./NoteTypeDropdown";
 import ChecklistEditor from "./ChecklistEditor";
 import ConfirmationDialog from "./ConfirmationDialog";
+import DatasheetEditor from "./DatasheetEditor";
+import RemindersEditor from "./RemindersEditor";
 
 const NoteEditor = ({ selectedNote, onUpdateNote }) => {
   const [title, setTitle] = useState("");
@@ -49,6 +51,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
   const isPlainText = noteType === "TEXT";
   const isChecklist = noteType === "CHECKLIST";
   const isRichText = noteType === "RICH_TEXT";
+  const isDatasheet = noteType === "DATASHEET";
 
   // Focus management for new notes
   useEffect(() => {
@@ -77,6 +80,10 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
         if (firstInput) {
           firstInput.focus();
         }
+      } else if (isDatasheet) {
+        // For datasheet, the DatasheetEditor will handle auto-focus
+        // Just blur the title to let the datasheet take focus
+        titleInputRef.current?.blur();
       }
     }
   };
@@ -259,7 +266,13 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
             (typeof selectedNote.content === "object" &&
               selectedNote.content.items &&
               selectedNote.content.items.length === 1 &&
-              !selectedNote.content.items[0].text));
+              !selectedNote.content.items[0].text) ||
+            (typeof selectedNote.content === "object" &&
+              selectedNote.content.columns &&
+              selectedNote.content.rows &&
+              selectedNote.content.rows.length === 1 &&
+              selectedNote.content.rows[0].cells &&
+              selectedNote.content.rows[0].cells.every((cell) => !cell.value)));
 
         if (isNewlyCreated) {
           setShouldFocusTitle(true);
@@ -283,6 +296,13 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
           // Make sure we have a valid content structure
           const checklistContent = selectedNote.content || { items: [] };
           updateCounts(checklistContent);
+        } else if (isDatasheet) {
+          // For datasheet, content is handled by DatasheetEditor
+          const datasheetContent = selectedNote.content || {
+            columns: [],
+            rows: [],
+          };
+          updateCounts(datasheetContent);
         }
 
         setIsInitialLoad(false);
@@ -308,6 +328,7 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
     isPlainText,
     isRichText,
     isChecklist,
+    isDatasheet,
   ]);
 
   const updateCounts = (content) => {
@@ -324,6 +345,17 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
       // For checklist, extract text from items
       if (content && content.items && Array.isArray(content.items)) {
         plainText = content.items.map((item) => item.text || "").join(" ");
+      } else {
+        plainText = "";
+      }
+    } else if (isDatasheet) {
+      // For datasheet, extract cell values for search
+      if (content && content.rows && Array.isArray(content.rows)) {
+        plainText = content.rows
+          .map((row) =>
+            row.cells ? row.cells.map((cell) => cell.value || "").join(" ") : ""
+          )
+          .join(" ");
       } else {
         plainText = "";
       }
@@ -385,6 +417,11 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
       setIsUserEditing(true);
       updateCounts(newContent);
       debouncedUpdate("content", newContent);
+    } else if (isDatasheet) {
+      // Handle datasheet content - newContent is already the object we need
+      setIsUserEditing(true);
+      updateCounts(newContent);
+      debouncedUpdate("content", newContent);
     }
   };
 
@@ -406,6 +443,18 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
         ) {
           return selectedNote.content.items.some(
             (item) => item.text && item.text.trim().length > 0
+          );
+        }
+        if (
+          selectedNote.content.rows &&
+          Array.isArray(selectedNote.content.rows)
+        ) {
+          return selectedNote.content.rows.some((row) =>
+            row.cells
+              ? row.cells.some(
+                  (cell) => cell.value && cell.value.trim().length > 0
+                )
+              : false
           );
         }
       }
@@ -438,6 +487,29 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
     if (newType === "CHECKLIST") {
       newContent = {
         items: [{ id: Date.now().toString(), text: "", checked: false }],
+      };
+    } else if (newType === "DATASHEET") {
+      newContent = {
+        columns: [
+          { id: "title", name: "Title", type: "text", width: "flex" },
+          { id: "amount", name: "Amount", type: "number", width: "120px" },
+          {
+            id: "datetime",
+            name: "Date & Time",
+            type: "datetime",
+            width: "200px",
+          },
+        ],
+        rows: [
+          {
+            id: Date.now().toString(),
+            cells: [
+              { columnId: "title", value: "" },
+              { columnId: "amount", value: "" },
+              { columnId: "datetime", value: "" },
+            ],
+          },
+        ],
       };
     } else {
       newContent = "";
@@ -677,6 +749,13 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
           onContentChange={handleContentChange}
         />
       );
+    } else if (noteType === "REMINDERS") {
+      return (
+        <RemindersEditor
+          content={selectedNote?.content}
+          onContentChange={handleContentChange}
+        />
+      );
     } else if (isPlainText) {
       return (
         <textarea
@@ -684,6 +763,13 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
           onChange={handleContentChange}
           className="note-content-textarea"
           placeholder="Start writing your note..."
+        />
+      );
+    } else if (isDatasheet) {
+      return (
+        <DatasheetEditor
+          content={selectedNote?.content}
+          onContentChange={handleContentChange}
         />
       );
     } else {
@@ -716,6 +802,12 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
       return (
         <div className="editor-mode-indicator">
           <span>Checklist Mode</span>
+        </div>
+      );
+    } else if (isDatasheet) {
+      return (
+        <div className="editor-mode-indicator">
+          <span>Datasheet Mode</span>
         </div>
       );
     }
@@ -755,26 +847,32 @@ const NoteEditor = ({ selectedNote, onUpdateNote }) => {
       </div>
 
       {/* Note Editor */}
-      <div className="note-editor">
-        <div className="note-header">
-          <input
-            ref={titleInputRef}
-            type="text"
-            value={title}
-            onChange={handleTitleChange}
-            onKeyDown={handleTitleKeyDown}
-            placeholder="Untitled"
-            className="note-title-input"
-          />
-          {isSaving && (
-            <div className="saving-indicator">
-              <div className="saving-dot"></div>
-              <span>Saving...</span>
-            </div>
-          )}
-        </div>
+      <div className={`note-editor ${isDatasheet ? "datasheet-mode" : ""}`}>
+        {!isChecklist && !isDatasheet && (
+          <div className="note-header">
+            <input
+              ref={titleInputRef}
+              type="text"
+              value={title}
+              onChange={handleTitleChange}
+              onKeyDown={handleTitleKeyDown}
+              placeholder="Untitled"
+              className="note-title-input"
+            />
+            {isSaving && (
+              <div className="saving-indicator">
+                <div className="saving-dot"></div>
+                <span>Saving...</span>
+              </div>
+            )}
+          </div>
+        )}
 
-        <div className="editor-container">
+        <div
+          className={`editor-container ${
+            isChecklist || isDatasheet ? "full-height" : ""
+          }`}
+        >
           <div className="content-wrapper">{renderEditor()}</div>
         </div>
       </div>
