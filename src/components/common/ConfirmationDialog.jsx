@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
+
+import "../../styles/ConfirmationDialog.css";
 import { Check, X, AlertTriangle } from "lucide-react";
-import "../styles/ConfirmationDialog.css";
 
 const ConfirmationDialog = ({
   message,

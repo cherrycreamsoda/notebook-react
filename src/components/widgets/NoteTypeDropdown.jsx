@@ -1,5 +1,7 @@
-import React from "react";
-import { useState, useRef, useEffect } from "react";
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+
+import "../../styles/NoteTypeDropdown.css";
 import {
   ChevronDown,
   FileText,
@@ -8,7 +10,6 @@ import {
   Bell,
   Table,
 } from "lucide-react";
-import "../styles/NoteTypeDropdown.css";
 
 const NOTE_TYPES = [
   {

@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
 
-import { useRef } from "react";
 import { Search, X } from "lucide-react";
 
 const SearchBar = ({ searchTerm, onSearchChange, onClear }) => {

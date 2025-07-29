@@ -1,6 +1,7 @@
 "use client";
-
 import React, { useState, useRef, useEffect } from "react";
+
+import "../../styles/FloatingActionButton.css";
 import {
   Plus,
   LayoutDashboard,
@@ -10,7 +11,6 @@ import {
   Bell,
   Table,
 } from "lucide-react";
-import "../styles/GlassmorphicFAB.css";
 
 const NOTE_TYPES = [
   {
@@ -45,7 +45,11 @@ const NOTE_TYPES = [
   },
 ];
 
-const GlassmorphicFAB = ({ onCreateNote, selectedNote, sidebarCollapsed }) => {
+const FloatingActionButton = ({
+  onCreateNote,
+  selectedNote,
+  sidebarCollapsed,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHolding, setIsHolding] = useState(false);
   const holdTimeoutRef = useRef(null);
@@ -188,7 +192,7 @@ const GlassmorphicFAB = ({ onCreateNote, selectedNote, sidebarCollapsed }) => {
         </div>
       )}
 
-      {/* Original FAB design restored */}
+      {/* Original FloatingActionButton design restored */}
       <div className="fab-container">
         <button
           className={`fab-button fab-create ${isHolding ? "holding" : ""} ${
@@ -218,4 +222,4 @@ const GlassmorphicFAB = ({ onCreateNote, selectedNote, sidebarCollapsed }) => {
   );
 };
 
-export default GlassmorphicFAB;
+export default FloatingActionButton;

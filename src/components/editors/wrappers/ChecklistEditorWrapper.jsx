@@ -1,14 +1,14 @@
 "use client";
-
 import React, { useEffect } from "react";
-import BaseEditor from "./BaseEditor";
-import DatasheetEditor from "../DatasheetEditor";
+
+import BaseEditor from "../BaseEditor";
+import ChecklistEditor from "../ChecklistEditor";
 
 /**
- * DatasheetEditorWrapper - Wraps existing DatasheetEditor with BaseEditor
- * Maintains all existing DatasheetEditor functionality
+ * ChecklistEditorWrapper - Wraps existing ChecklistEditor with BaseEditor
+ * Maintains all existing ChecklistEditor functionality
  */
-const DatasheetEditorContent = ({
+const ChecklistEditorContent = ({
   selectedNote,
   onContentChange,
   updateCounts,
@@ -16,8 +16,12 @@ const DatasheetEditorContent = ({
   // Set up global focus handler for title Enter key
   useEffect(() => {
     window.editorFocusHandler = () => {
-      // DatasheetEditor handles auto-focus internally
-      // Just blur the title to let the datasheet take focus
+      const firstInput = document.querySelector(
+        ".checklist-editor .item-input"
+      );
+      if (firstInput) {
+        firstInput.focus();
+      }
     };
     return () => {
       window.editorFocusHandler = null;
@@ -27,7 +31,7 @@ const DatasheetEditorContent = ({
   // Initialize counts
   useEffect(() => {
     if (selectedNote) {
-      updateCounts(selectedNote.content || { columns: [], rows: [] });
+      updateCounts(selectedNote.content || { items: [] });
     }
   }, [selectedNote, updateCounts]);
 
@@ -36,18 +40,24 @@ const DatasheetEditorContent = ({
     onContentChange(newContent);
   };
 
+  const editorModeIndicator = (
+    <div className="editor-mode-indicator">
+      <span>Checklist Mode</span>
+    </div>
+  );
+
   return (
-    <DatasheetEditor
+    <ChecklistEditor
       content={selectedNote?.content}
       onContentChange={handleContentChange}
     />
   );
 };
 
-const DatasheetEditorWrapper = (props) => {
+const ChecklistEditorWrapper = (props) => {
   const editorModeIndicator = (
     <div className="editor-mode-indicator">
-      <span>Datasheet Mode</span>
+      <span>Checklist Mode</span>
     </div>
   );
 
@@ -58,11 +68,11 @@ const DatasheetEditorWrapper = (props) => {
       showTitle={false}
       showToolbar={true}
       showStatusBar={true}
-      editorClassName="datasheet-mode"
+      editorClassName="checklist-mode"
     >
-      <DatasheetEditorContent />
+      <ChecklistEditorContent />
     </BaseEditor>
   );
 };
 
-export default DatasheetEditorWrapper;
+export default ChecklistEditorWrapper;

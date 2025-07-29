@@ -1,13 +1,15 @@
 "use client";
-
-import { Plus, Github, PanelLeftClose } from "lucide-react";
 import React, { useRef, useState } from "react";
-import "../styles/Sidebar.css";
-import SearchBar from "./SearchBar";
-import NavigationMenu from "./NavigationMenu";
-import NoteList from "./NoteList";
-import ConfirmationDialog from "./ConfirmationDialog";
-import { useAsyncAction } from "../hooks/useAsyncAction";
+
+import SearchBar from "../widgets/SearchBar";
+import NavigationMenu from "../widgets/NavigationMenu";
+import NoteList from "../widgets/NoteList";
+import ConfirmationDialog from "../common/ConfirmationDialog";
+
+import { useAsyncAction } from "../../hooks/useAsyncAction";
+
+import "../../styles/Sidebar.css";
+import { Plus, Github, PanelLeftClose } from "lucide-react";
 
 const Sidebar = ({
   notes,

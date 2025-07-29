@@ -1,4 +1,6 @@
+"use client";
 import React from "react";
+
 import { StickyNote, Pin, Trash2 } from "lucide-react";
 
 const NavigationMenu = ({

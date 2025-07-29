@@ -1,6 +1,7 @@
 import React from "react";
+
+import "../../styles/ErrorMessage.css";
 import { AlertCircle, X, RefreshCw } from "lucide-react";
-import "../styles/ErrorMessage.css";
 
 const ErrorMessage = ({ message, onDismiss, onRetry }) => {
   return (

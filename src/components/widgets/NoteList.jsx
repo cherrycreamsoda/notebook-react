@@ -1,5 +1,10 @@
-import React from "react";
-import { useState, useEffect } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+
+import LoadingSpinner from "../common/LoadingSpinner";
+import ConfirmationDialog from "../common/ConfirmationDialog";
+import { formatDate, getPreview } from "../../utils/dateUtils";
+
 import {
   ArrowLeft,
   RotateCcw,
@@ -13,9 +18,6 @@ import {
   Bell,
   Table,
 } from "lucide-react";
-import LoadingSpinner from "./LoadingSpinner";
-import ConfirmationDialog from "./ConfirmationDialog";
-import { formatDate, getPreview } from "../utils/dateUtils";
 
 const NOTE_TYPE_ICONS = {
   RICH_TEXT: FileText,

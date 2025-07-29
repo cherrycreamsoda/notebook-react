@@ -1,8 +1,9 @@
 "use client";
-
 import React, { useEffect, useRef } from "react";
-import { Type } from "lucide-react";
+
 import BaseEditor from "./BaseEditor";
+
+import { Type } from "lucide-react";
 
 /**
  * PlainTextEditor - Simple textarea editor

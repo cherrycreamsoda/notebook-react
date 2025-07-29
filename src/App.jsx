@@ -1,15 +1,17 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
+
+import TopBar from "./components/layout/TopBar";
+import Sidebar from "./components/layout/Sidebar";
+import MainContent from "./components/layout/MainContent";
+import LoadingSpinner from "./components/common/LoadingSpinner";
+import ErrorMessage from "./components/common/ErrorMessage";
+import FloatingActionButton from "./components/widgets/FloatingActionButton";
+
 import { ThemeProvider } from "./contexts/ThemeContext";
-import TopBar from "./components/TopBar";
-import Sidebar from "./components/Sidebar";
-import MainContent from "./components/MainContent";
-import LoadingSpinner from "./components/LoadingSpinner";
-import ErrorMessage from "./components/ErrorMessage";
-import GlassmorphicFAB from "./components/GlassmorphicFAB";
-import { checkBackendHealth } from "./services/api";
 import { useNotes } from "./hooks/useNotes";
+import { checkBackendHealth } from "./services/api";
+
 import "./styles/App.css";
 
 function AppContent() {
@@ -183,7 +185,7 @@ function AppContent() {
         headerBackgroundEnabled={headerBackgroundEnabled}
       />
 
-      <GlassmorphicFAB
+      <FloatingActionButton
         onCreateNote={handleCreateNote}
         selectedNote={selectedNote}
         sidebarCollapsed={sidebarCollapsed}

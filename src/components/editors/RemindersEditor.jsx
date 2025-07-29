@@ -1,6 +1,7 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from "react";
+
+import "../../styles/RemindersEditor.css";
 import {
   Plus,
   X,
@@ -10,7 +11,6 @@ import {
   AlertCircle,
   Calendar,
 } from "lucide-react";
-import "../styles/RemindersEditor.css";
 
 const RemindersEditor = ({ content, onContentChange }) => {
   const [reminders, setReminders] = useState([]);

@@ -1,6 +1,8 @@
+"use client";
 import React, { useState, useEffect, useRef } from "react";
+
+import "../../styles/ChecklistEditor.css";
 import { Plus, X, GripVertical } from "lucide-react";
-import "../styles/ChecklistEditor.css";
 
 const ChecklistEditor = ({ content, onContentChange }) => {
   const [items, setItems] = useState([]);

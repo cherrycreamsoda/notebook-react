@@ -1,6 +1,12 @@
 "use client";
-
 import React, { useEffect, useRef, useState } from "react";
+
+import LoadingSpinner from "../common/LoadingSpinner";
+import EditorContainer from "../editors/EditorContainer";
+
+import { useAsyncAction } from "../../hooks/useAsyncAction";
+
+import "../../styles/MainContent.css";
 import {
   PanelLeftOpen,
   PanelLeftClose,
@@ -9,11 +15,6 @@ import {
   Maximize,
   Minimize,
 } from "lucide-react";
-import LoadingSpinner from "./LoadingSpinner";
-import EditorContainer from "./editors/EditorContainer";
-
-import { useAsyncAction } from "../hooks/useAsyncAction";
-import "../styles/MainContent.css";
 
 const MainContent = ({
   selectedNote,

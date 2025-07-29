@@ -1,7 +1,7 @@
 import React from "react";
 
+import "../../styles/LoadingSpinner.css";
 import { Loader2 } from "lucide-react";
-import "../styles/LoadingSpinner.css";
 
 const LoadingSpinner = ({
   message = "Loading...",

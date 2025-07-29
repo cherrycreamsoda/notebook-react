@@ -1,10 +1,11 @@
 "use client";
 import React from "react";
+
 import RichTextEditor from "./RichTextEditor";
 import PlainTextEditor from "./PlainTextEditor";
-import ChecklistEditorWrapper from "./ChecklistEditorWrapper";
-import RemindersEditorWrapper from "./RemindersEditorWrapper";
-import DatasheetEditorWrapper from "./DatasheetEditorWrapper";
+import ChecklistEditorWrapper from "./wrappers/ChecklistEditorWrapper";
+import RemindersEditorWrapper from "./wrappers/RemindersEditorWrapper";
+import DatasheetEditorWrapper from "./wrappers/DatasheetEditorWrapper";
 
 /**
  * EditorContainer - Main editor switcher component

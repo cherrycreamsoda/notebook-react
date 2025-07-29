@@ -1,6 +1,11 @@
 "use client";
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
+
+import NoteTypeDropdown from "../widgets/NoteTypeDropdown";
+import ConfirmationDialog from "../common/ConfirmationDialog";
+
+import { useDebounce } from "../../hooks/useDebounce";
+
 import {
   Bold,
   Italic,
@@ -10,9 +15,6 @@ import {
   Type,
   Minus,
 } from "lucide-react";
-import { useDebounce } from "../../hooks/useDebounce";
-import NoteTypeDropdown from "../NoteTypeDropdown";
-import ConfirmationDialog from "../ConfirmationDialog";
 
 const RichTextEditor = ({ selectedNote, onUpdateNote }) => {
   const [title, setTitle] = useState("");

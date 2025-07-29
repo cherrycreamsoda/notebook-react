@@ -1,9 +1,10 @@
 "use client";
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
+
+import NoteTypeDropdown from "../widgets/NoteTypeDropdown";
+import ConfirmationDialog from "../common/ConfirmationDialog";
+
 import { useDebounce } from "../../hooks/useDebounce";
-import NoteTypeDropdown from "../NoteTypeDropdown";
-import ConfirmationDialog from "../ConfirmationDialog";
 
 /**
  * BaseEditor - Abstract base class for all editor types

@@ -1,9 +1,10 @@
 "use client";
-
 import React, { useState } from "react";
+
+import { useTheme } from "../../contexts/ThemeContext";
+
+import "../../styles/TopBar.css";
 import { Sun, Moon, User } from "lucide-react";
-import { useTheme } from "../contexts/ThemeContext";
-import "../styles/TopBar.css";
 
 const TopBar = ({ headerBackgroundEnabled, onToggleHeaderBackground }) => {
   const [showComingSoon, setShowComingSoon] = useState(null);

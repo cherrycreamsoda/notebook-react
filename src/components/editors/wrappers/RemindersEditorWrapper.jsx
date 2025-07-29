@@ -1,7 +1,7 @@
 "use client";
-
 import React, { useEffect } from "react";
-import BaseEditor from "./BaseEditor";
+
+import BaseEditor from "../BaseEditor";
 import RemindersEditor from "../RemindersEditor";
 
 /**
