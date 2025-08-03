@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-import RichTextEditor from "./RichTextEditor";
+import RichTextEditorWrapper from "./wrappers/RichTextEditorWrapper";
 import PlainTextEditor from "./PlainTextEditor";
 import ChecklistEditorWrapper from "./wrappers/ChecklistEditorWrapper";
 import RemindersEditorWrapper from "./wrappers/RemindersEditorWrapper";
@@ -38,7 +38,7 @@ const EditorContainer = ({ selectedNote, onUpdateNote }) => {
 
     case "RICH_TEXT":
     default:
-      return <RichTextEditor {...commonProps} />;
+      return <RichTextEditorWrapper {...commonProps} />;
   }
 };
 
