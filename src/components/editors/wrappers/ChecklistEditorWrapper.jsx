@@ -5,8 +5,8 @@ import BaseEditor from "../BaseEditor";
 import ChecklistEditor from "../ChecklistEditor";
 
 /**
- * ChecklistEditorWrapper - Wraps existing ChecklistEditor with BaseEditor
- * Maintains all existing ChecklistEditor functionality
+ * ChecklistEditorWrapper - Simplified without custom toolbar
+ * Now uses the global EditorToolbar through BaseEditor
  */
 const ChecklistEditorContent = ({
   selectedNote,
@@ -40,12 +40,6 @@ const ChecklistEditorContent = ({
     onContentChange(newContent);
   };
 
-  const editorModeIndicator = (
-    <div className="editor-mode-indicator">
-      <span>Checklist Mode</span>
-    </div>
-  );
-
   return (
     <ChecklistEditor
       content={selectedNote?.content}
@@ -55,16 +49,9 @@ const ChecklistEditorContent = ({
 };
 
 const ChecklistEditorWrapper = (props) => {
-  const editorModeIndicator = (
-    <div className="editor-mode-indicator">
-      <span>Checklist Mode</span>
-    </div>
-  );
-
   return (
     <BaseEditor
       {...props}
-      editorSpecificToolbar={editorModeIndicator}
       showTitle={false}
       showToolbar={true}
       showStatusBar={true}

@@ -3,11 +3,9 @@ import React, { useEffect, useRef } from "react";
 
 import BaseEditor from "./BaseEditor";
 
-import { Type } from "lucide-react";
-
 /**
- * PlainTextEditor - Simple textarea editor
- * Extends BaseEditor with plain text specific functionality
+ * PlainTextEditor - Simplified without custom toolbar
+ * Now uses the global EditorToolbar through BaseEditor
  */
 const PlainTextEditorContent = ({
   selectedNote,
@@ -43,13 +41,6 @@ const PlainTextEditorContent = ({
     onContentChange(textContent);
   };
 
-  const editorModeIndicator = (
-    <div className="editor-mode-indicator">
-      <Type size={14} />
-      <span>Plain Text Mode</span>
-    </div>
-  );
-
   return (
     <textarea
       ref={plainTextRef}
@@ -61,17 +52,9 @@ const PlainTextEditorContent = ({
 };
 
 const PlainTextEditor = (props) => {
-  const editorModeIndicator = (
-    <div className="editor-mode-indicator">
-      <Type size={14} />
-      <span>Plain Text Mode</span>
-    </div>
-  );
-
   return (
     <BaseEditor
       {...props}
-      editorSpecificToolbar={editorModeIndicator}
       showTitle={true}
       showToolbar={true}
       showStatusBar={true}

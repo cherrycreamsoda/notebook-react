@@ -1,15 +1,18 @@
 "use client";
 import React from "react";
 
-import NoteTypeDropdown from "../widgets/NoteTypeDropdown";
+import EditorToolbar from "../widgets/EditorToolbar";
 import ConfirmationDialog from "../common/ConfirmationDialog";
 import { useBaseEditor } from "../../hooks/useBaseEditor.js";
 
+/**
+ * BaseEditor - Updated to use the new global EditorToolbar
+ * Simplified toolbar management with centralized control
+ */
 const BaseEditor = ({
   selectedNote,
   onUpdateNote,
   children,
-  editorSpecificToolbar = null,
   showTitle = true,
   showToolbar = true,
   showStatusBar = true,
@@ -36,16 +39,12 @@ const BaseEditor = ({
   return (
     <>
       {showToolbar && (
-        <div className="formatting-toolbar">
-          <NoteTypeDropdown
-            selectedType={noteType}
-            onTypeChange={handleTypeChange}
-            disabled={!selectedNote}
-            shouldBlink={shouldBlinkDropdown}
-          />
-          <div className="toolbar-separator" />
-          {editorSpecificToolbar}
-        </div>
+        <EditorToolbar
+          noteType={noteType}
+          selectedNote={selectedNote}
+          onTypeChange={handleTypeChange}
+          shouldBlinkDropdown={shouldBlinkDropdown}
+        />
       )}
 
       <div className="editor-content-area">

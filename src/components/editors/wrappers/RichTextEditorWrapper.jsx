@@ -3,11 +3,10 @@ import React, { useEffect } from "react";
 
 import BaseEditor from "../BaseEditor";
 import RichTextEditor from "../RichTextEditor";
-import RichTextToolbar from "../RichTextToolbar";
 
 /**
- * RichTextEditorWrapper - Wraps RichTextEditor functionality with BaseEditor
- * Maintains all sophisticated rich text features while achieving consistency
+ * RichTextEditorWrapper - Simplified without custom toolbar
+ * Now uses the global EditorToolbar through BaseEditor
  */
 const RichTextEditorWrapper = (props) => {
   // Set up global focus handler for title Enter key
@@ -29,9 +28,6 @@ const RichTextEditorWrapper = (props) => {
   return (
     <BaseEditor
       {...props}
-      editorSpecificToolbar={
-        <RichTextToolbar selectedNote={props.selectedNote} />
-      }
       showTitle={true}
       showToolbar={true}
       showStatusBar={true}

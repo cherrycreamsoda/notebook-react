@@ -5,8 +5,8 @@ import BaseEditor from "../BaseEditor";
 import DatasheetEditor from "../DatasheetEditor";
 
 /**
- * DatasheetEditorWrapper - Wraps existing DatasheetEditor with BaseEditor
- * Maintains all existing DatasheetEditor functionality
+ * DatasheetEditorWrapper - Simplified without custom toolbar
+ * Now uses the global EditorToolbar through BaseEditor
  */
 const DatasheetEditorContent = ({
   selectedNote,
@@ -45,16 +45,9 @@ const DatasheetEditorContent = ({
 };
 
 const DatasheetEditorWrapper = (props) => {
-  const editorModeIndicator = (
-    <div className="editor-mode-indicator">
-      <span>Datasheet Mode</span>
-    </div>
-  );
-
   return (
     <BaseEditor
       {...props}
-      editorSpecificToolbar={editorModeIndicator}
       showTitle={false}
       showToolbar={true}
       showStatusBar={true}

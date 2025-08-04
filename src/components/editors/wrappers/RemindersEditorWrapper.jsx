@@ -5,8 +5,8 @@ import BaseEditor from "../BaseEditor";
 import RemindersEditor from "../RemindersEditor";
 
 /**
- * RemindersEditorWrapper - Wraps existing RemindersEditor with BaseEditor
- * Maintains all existing RemindersEditor functionality
+ * RemindersEditorWrapper - Simplified without custom toolbar
+ * Now uses the global EditorToolbar through BaseEditor
  */
 const RemindersEditorContent = ({
   selectedNote,
@@ -49,16 +49,9 @@ const RemindersEditorContent = ({
 };
 
 const RemindersEditorWrapper = (props) => {
-  const editorModeIndicator = (
-    <div className="editor-mode-indicator">
-      <span>Reminders Mode</span>
-    </div>
-  );
-
   return (
     <BaseEditor
       {...props}
-      editorSpecificToolbar={editorModeIndicator}
       showTitle={false}
       showToolbar={true}
       showStatusBar={true}
