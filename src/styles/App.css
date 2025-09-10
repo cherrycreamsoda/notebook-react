@@ -69,13 +69,18 @@
 }
 
 .toggle-switch.active {
+  outline: white solid 2px;
   background: linear-gradient(
     135deg,
-    #14efff,
-    #2be262,
-    #89dc14,
-    #ff2356,
-    #8a2be2
+    #dddc9f,
+    #fff488,
+    #335356,
+    #1e3232,
+    #181c19,
+    #1e3232,
+    #335356,
+    #fff488,
+    #dddc9f
   );
   background-size: 300% 300%;
   animation: gradientMove 20s infinite;

@@ -1,15 +1,17 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 
-import { useState, useEffect } from "react";
+import TopBar from "./components/layout/TopBar";
+import Sidebar from "./components/layout/Sidebar";
+import MainContent from "./components/layout/MainContent";
+import LoadingSpinner from "./components/common/LoadingSpinner";
+import ErrorMessage from "./components/common/ErrorMessage";
+import FloatingActionButton from "./components/widgets/FloatingActionButton";
+
 import { ThemeProvider } from "./contexts/ThemeContext";
-import TopBar from "./components/TopBar";
-import Sidebar from "./components/Sidebar";
-import MainContent from "./components/MainContent";
-import LoadingSpinner from "./components/LoadingSpinner";
-import ErrorMessage from "./components/ErrorMessage";
-import GlassmorphicFAB from "./components/GlassmorphicFAB";
-import { checkBackendHealth } from "./services/api";
 import { useNotes } from "./hooks/useNotes";
+import { checkBackendHealth } from "./services/api";
+
 import "./styles/App.css";
 
 function AppContent() {
@@ -21,6 +23,7 @@ function AppContent() {
   const [backendConnected, setBackendConnected] = useState(false);
   const [isTransitioningFullscreen, setIsTransitioningFullscreen] =
     useState(false);
+  const [headerBackgroundEnabled, setHeaderBackgroundEnabled] = useState(true);
 
   const {
     notes,
@@ -29,6 +32,7 @@ function AppContent() {
     counts,
     loading,
     error,
+    createError,
     clearError,
     loadNotes,
     createNote,
@@ -67,8 +71,8 @@ function AppContent() {
     }
   }, [isFullscreen]);
 
-  const handleCreateNote = async () => {
-    const result = await createNote();
+  const handleCreateNote = async (noteData = {}) => {
+    const result = await createNote(noteData); // Pass noteData here
     if (result && currentView !== "notes") {
       setCurrentView("notes");
     }
@@ -119,6 +123,10 @@ function AppContent() {
     setSidebarCollapsed(!sidebarCollapsed);
   };
 
+  const handleToggleHeaderBackground = () => {
+    setHeaderBackgroundEnabled(!headerBackgroundEnabled);
+  };
+
   if (initialLoading) {
     return (
       <div className="app">
@@ -131,11 +139,14 @@ function AppContent() {
 
   return (
     <div className={`app ${isFullscreen ? "fullscreen-mode" : ""}`}>
-      <TopBar />
+      <TopBar
+        headerBackgroundEnabled={headerBackgroundEnabled}
+        onToggleHeaderBackground={handleToggleHeaderBackground}
+      />
 
-      {error && (
+      {(error || createError) && (
         <ErrorMessage
-          message={error}
+          message={error || createError}
           onDismiss={clearError}
           onRetry={() => loadNotes(currentView, searchTerm)}
         />
@@ -171,9 +182,10 @@ function AppContent() {
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
         isTransitioningFullscreen={isTransitioningFullscreen}
+        headerBackgroundEnabled={headerBackgroundEnabled}
       />
 
-      <GlassmorphicFAB
+      <FloatingActionButton
         onCreateNote={handleCreateNote}
         selectedNote={selectedNote}
         sidebarCollapsed={sidebarCollapsed}

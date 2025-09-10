@@ -381,6 +381,7 @@ GitHub: [@cherrycreamsoda](https://github.com/cherrycreamsoda)
 
 - Icons by [Lucide](https://lucide.dev/)
 - Built with love and modern web tools ❤️
+- Header Background used from https://freepik.com/
 
 ---
 

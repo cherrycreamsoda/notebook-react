@@ -51,15 +51,27 @@
 }
 
 .toggle-switch.active {
-  background: linear-gradient(135deg, #14efff, #2be262, #89dc14, #ff2356, #8a2be2);
+  outline: white solid 2px;
+  background: linear-gradient(
+    135deg,
+    #dddc9f,
+    #fff488,
+    #335356,
+    #1e3232,
+    #181c19,
+    #1e3232,
+    #335356,
+    #fff488,
+    #dddc9f
+  );
   background-size: 300% 300%;
   animation: gradientMove 20s infinite;
-  box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+  box-shadow: 0 0 20px rgba(255, 244, 136, 0.3);
 }
 
 .toggle-switch.inactive {
-  background: linear-gradient(135deg, #e5e5e5, #cccccc);
-  border-color: #0a0a0a;
+  background: linear-gradient(135deg, #404040, #2a2a2a);
+  border-color: #181818;
 }
 
 .toggle-switch-slider {
@@ -82,7 +94,7 @@
 
 .toggle-switch.inactive .toggle-switch-slider {
   transform: translateX(0);
-  background: #0a0a0a;
+  background: #9ca3af;
 }
 
 @keyframes gradientMove {

@@ -1,0 +1,457 @@
+.datasheet-editor {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.datasheet-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1a1a1a;
+  min-height: 0; /* Important for flex children */
+  margin: 8px;
+}
+
+/* Header */
+.datasheet-header {
+  display: flex;
+  background: #2a2a2a;
+  border-bottom: 2px solid #404040;
+  min-height: 50px;
+  flex-shrink: 0;
+}
+
+.datasheet-header-cell {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-right: 1px solid #404040;
+  background: #2a2a2a;
+  position: relative;
+  overflow: hidden;
+}
+
+.datasheet-header-cell:last-child {
+  border-right: none;
+}
+
+.actions-header {
+  width: 80px;
+  flex: 0 0 80px;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.header-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Body - FIXED SCROLLING */
+.datasheet-body {
+  flex: 1;
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: auto; /* Enable horizontal scrolling if needed */
+  min-height: 0; /* Important for flex children */
+}
+
+.datasheet-row-container {
+  position: relative;
+}
+
+.datasheet-row {
+  display: flex;
+  min-height: 48px;
+  border-bottom: 1px solid #2a2a2a;
+  transition: all 0.2s ease;
+}
+
+.datasheet-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.datasheet-row:last-child {
+  border-bottom: none;
+}
+
+.datasheet-cell {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-right: 1px solid #2a2a2a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  min-height: 48px;
+  overflow: hidden;
+}
+
+.datasheet-cell:last-child {
+  border-right: none;
+}
+
+.datasheet-cell:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.datasheet-cell.selected {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+  outline: 2px solid #10b981;
+  outline-offset: -2px;
+}
+
+.actions-cell {
+  width: 80px;
+  flex: 0 0 80px;
+  justify-content: center;
+  cursor: default;
+  min-width: 80px;
+}
+
+.actions-cell:hover {
+  background: transparent;
+}
+
+.cell-input-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.cell-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 14px;
+  padding: 0;
+  width: 100%;
+}
+
+.cell-input:focus {
+  color: #ffffff;
+}
+
+.cell-input::placeholder {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.date-picker-btn {
+  background: #404040;
+  border: 1px solid #6b7280;
+  border-radius: 4px;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.date-picker-btn:hover {
+  background: #4b5563;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+.cell-value {
+  color: #f1f5f9;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.remove-row-btn {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.remove-row-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Inline Add Row Button */
+.add-row-inline-btn {
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  background: #404040;
+  border: 1px solid #6b7280;
+  border-radius: 50%;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0;
+  z-index: 10;
+}
+
+.datasheet-row-container:hover .add-row-inline-btn {
+  opacity: 1;
+}
+
+.add-row-inline-btn:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  transform: translateX(-50%) scale(1.1);
+}
+
+/* Date Picker */
+.date-picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.date-picker {
+  background: #2a2a2a;
+  border: 1px solid #404040;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  min-width: 300px;
+  animation: datePickerSlideIn 0.3s ease-out;
+}
+
+@keyframes datePickerSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.date-picker-header {
+  text-align: center;
+  margin-bottom: 16px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.date-picker-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.weekday {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 4px;
+}
+
+.date-picker-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 16px;
+}
+
+.day {
+  background: none;
+  border: none;
+  color: #f1f5f9;
+  cursor: pointer;
+  padding: 8px 4px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day:hover {
+  background: #404040;
+  color: #ffffff;
+}
+
+.day.other-month {
+  color: #6b7280;
+}
+
+.day.today {
+  background: #10b981;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.day.today:hover {
+  background: #059669;
+}
+
+.date-picker-time {
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+  border-top: 1px solid #404040;
+}
+
+.time-now-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #404040;
+  border: 1px solid #6b7280;
+  border-radius: 6px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.time-now-btn:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
+/* FIXED SCROLLBAR for datasheet body */
+.datasheet-body::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.datasheet-body::-webkit-scrollbar-track {
+  background: rgba(42, 42, 42, 0.1);
+  border-radius: 6px;
+}
+
+.datasheet-body::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.datasheet-body::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+  background-clip: content-box;
+}
+
+.datasheet-body::-webkit-scrollbar-corner {
+  background: #1a1a1a;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .datasheet-table {
+    margin: 4px;
+  }
+
+  .datasheet-header-cell,
+  .datasheet-cell {
+    padding: 8px 12px;
+  }
+
+  .header-title,
+  .cell-input,
+  .cell-value {
+    font-size: 13px;
+  }
+
+  .datasheet-row {
+    min-height: 44px;
+  }
+
+  .actions-header,
+  .actions-cell {
+    width: 60px;
+    flex: 0 0 60px;
+    min-width: 60px;
+  }
+
+  .date-picker {
+    min-width: 280px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .datasheet-header-cell,
+  .datasheet-cell {
+    padding: 6px 8px;
+  }
+
+  .header-title,
+  .cell-input,
+  .cell-value {
+    font-size: 12px;
+  }
+
+  .datasheet-row {
+    min-height: 40px;
+  }
+
+  .actions-header,
+  .actions-cell {
+    width: 50px;
+    flex: 0 0 50px;
+    min-width: 50px;
+  }
+
+  .date-picker {
+    min-width: 260px;
+    padding: 12px;
+  }
+
+  .day {
+    min-height: 28px;
+    font-size: 12px;
+  }
+}

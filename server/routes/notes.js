@@ -6,7 +6,7 @@ const router = express.Router();
 // Get all notes with optional filtering and search
 router.get("/", async (req, res) => {
   try {
-    const { view, search, includeAll } = req.query;
+    const { view, search, includeAll, type } = req.query;
     let notes;
 
     if (includeAll === "true") {
@@ -14,6 +14,9 @@ router.get("/", async (req, res) => {
     } else if (search) {
       const includeDeleted = view === "deleted";
       notes = await Note.searchNotes(search, includeDeleted);
+    } else if (type) {
+      const includeDeleted = view === "deleted";
+      notes = await Note.getNotesByType(type, includeDeleted);
     } else {
       switch (view) {
         case "pinned":
@@ -44,9 +47,14 @@ router.get("/", async (req, res) => {
 // Create a new note
 router.post("/", async (req, res) => {
   try {
-    const { title = "New Note", content = "", isPinned = false } = req.body;
+    const {
+      title = "New Note",
+      content = "",
+      isPinned = false,
+      type = "RICH_TEXT",
+    } = req.body;
 
-    const note = new Note({ title, content, isPinned });
+    const note = new Note({ title, content, isPinned, type });
     const savedNote = await note.save();
 
     res.status(201).json({
@@ -66,7 +74,7 @@ router.post("/", async (req, res) => {
 // Update a note
 router.put("/:id", async (req, res) => {
   try {
-    const { title, content, isPinned } = req.body;
+    const { title, content, isPinned, type } = req.body;
     const note = await Note.findById(req.params.id);
 
     if (!note) {
@@ -76,6 +84,7 @@ router.put("/:id", async (req, res) => {
     if (title !== undefined) note.title = title;
     if (content !== undefined) note.content = content;
     if (isPinned !== undefined) note.isPinned = isPinned;
+    if (type !== undefined) note.type = type;
 
     const updatedNote = await note.save();
 
