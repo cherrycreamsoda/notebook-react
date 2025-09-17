@@ -1,0 +1,16 @@
+.fullscreenTopBar {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.fullscreenSidebarExpanded {
+  width: 100% !important;
+  position: absolute !important;
+  z-index: 1000 !important;
+}
+
+.fullscreenSidebarCollapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
