@@ -117,29 +117,6 @@
   z-index: 2;
 }
 
-.sidebar-toggle-btn-main {
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.5s ease;
-  width: 32px;
-  height: 32px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.sidebar-toggle-btn-main:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-}
-
 .note-header-actions {
   display: flex;
   gap: 8px;
@@ -171,64 +148,27 @@
   color: white;
 }
 
+.note-header-btn.active {
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgb(255, 255, 255);
+  color: white;
+}
+
 .note-header-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.note-header-btn.pin-btn.active {
-  color: #fbbf24;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.note-header-btn.pin-btn:hover {
+.pin-btn.active {
   color: #fbbf24;
 }
 
-.note-header-btn.delete-btn {
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.5s ease;
-  width: 32px;
-  height: 32px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+.pin-btn:hover {
+  color: #fbbf24;
 }
 
-.note-header-btn.delete-btn:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+.delete-btn:hover {
   color: rgb(197, 0, 0);
-}
-
-.fullscreen-toggle-btn {
-  padding: 8px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.5s ease;
-  width: 32px;
-  height: 32px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.fullscreen-toggle-btn:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
 }
 
 .main-content-inner {

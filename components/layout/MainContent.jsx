@@ -176,7 +176,7 @@ const MainHeader = React.forwardRef(
     <div className={className} ref={ref}>
       <div className="header-left-actions">
         <button
-          className="sidebar-toggle-btn-main"
+          className={`note-header-btn ${sidebarCollapsed ? "" : "active"}`}
           onClick={onToggleSidebar}
           title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
@@ -187,7 +187,7 @@ const MainHeader = React.forwardRef(
           )}
         </button>
         <button
-          className="fullscreen-toggle-btn"
+          className={`note-header-btn ${isFullscreen ? "active" : ""}`}
           onClick={onToggleFullscreen}
           title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
         >
