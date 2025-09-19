@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-
+import Portal from "./Portal"; // relative to widgets folder
 import "../../styles/NoteTypeDropdown.css";
 import {
   ChevronDown,
@@ -46,101 +46,144 @@ const NOTE_TYPES = [
 
 const NoteTypeDropdown = ({
   selectedType = "RICH_TEXT",
-  onTypeChange,
+  onTypeChange = () => {},
   disabled = false,
   shouldBlink = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
-  const dropdownRef = useRef(null);
+  const triggerRef = useRef(null);
+  const menuRef = useRef(null);
+  const [menuStyle, setMenuStyle] = useState(null);
 
   const selectedTypeData =
-    NOTE_TYPES.find((type) => type.value === selectedType) || NOTE_TYPES[0];
+    NOTE_TYPES.find((t) => t.value === selectedType) || NOTE_TYPES[0];
 
+  // blinking effect
   useEffect(() => {
     if (shouldBlink) {
       setIsBlinking(true);
-      const timer = setTimeout(() => {
-        setIsBlinking(false);
-      }, 1000);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => setIsBlinking(false), 1000);
+      return () => clearTimeout(t);
     }
   }, [shouldBlink]);
 
+  // close on outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    function onDocClick(e) {
+      if (triggerRef.current && triggerRef.current.contains(e.target)) return;
+      if (menuRef.current && menuRef.current.contains(e.target)) return;
+      setIsOpen(false);
+    }
+    document.addEventListener("pointerdown", onDocClick, true);
+    return () => document.removeEventListener("pointerdown", onDocClick, true);
   }, []);
 
-  const handleTypeSelect = (type) => {
-    if (type.value !== selectedType) {
-      onTypeChange(type.value);
+  // compute menu position
+  useEffect(() => {
+    function compute() {
+      if (!triggerRef.current) return;
+      const r = triggerRef.current.getBoundingClientRect();
+      const left = Math.max(8, Math.min(r.left, window.innerWidth - 320));
+      const top = r.bottom; // fixed positioning (viewport coords)
+      setMenuStyle({
+        position: "fixed",
+        top: `${top}px`,
+        left: `${left}px`,
+        minWidth: "280px",
+      });
     }
+    if (isOpen) {
+      compute();
+      window.addEventListener("resize", compute);
+      window.addEventListener("scroll", compute, true);
+    }
+    return () => {
+      window.removeEventListener("resize", compute);
+      window.removeEventListener("scroll", compute, true);
+    };
+  }, [isOpen]);
+
+  const handleToggle = (e) => {
+    if (e && e.preventDefault) e.preventDefault(); // stop blur
+    if (!disabled) setIsOpen((s) => !s);
+  };
+
+  const handleTypeSelect = (type) => {
+    if (type.value !== selectedType) onTypeChange(type.value);
     setIsOpen(false);
   };
 
-  const handleToggle = () => {
-    if (!disabled) {
-      setIsOpen(!isOpen);
-    }
-  };
-
   return (
-    <div
-      className={`note-type-dropdown ${isBlinking ? "blinking" : ""}`}
-      ref={dropdownRef}
-    >
-      <button
-        className={`dropdown-trigger ${isOpen ? "open" : ""} ${
-          disabled ? "disabled" : ""
-        }`}
-        onClick={handleToggle}
-        disabled={disabled}
-        title={`Note Type: ${selectedTypeData.label}`}
+    <>
+      <div
+        className={`note-type-dropdown ${isBlinking ? "blinking" : ""}`}
+        ref={triggerRef}
       >
-        <selectedTypeData.icon size={14} />
-        <ChevronDown
-          size={12}
-          className={`chevron ${isOpen ? "rotated" : ""}`}
-        />
-      </button>
+        <button
+          className={`dropdown-trigger ${isOpen ? "open" : ""} ${
+            disabled ? "disabled" : ""
+          }`}
+          onClick={handleToggle}
+          onMouseDown={(e) => e.preventDefault()}
+          disabled={disabled}
+          title={`Note Type: ${selectedTypeData.label}`}
+          aria-haspopup="menu"
+          aria-expanded={isOpen}
+        >
+          <selectedTypeData.icon size={14} />
+          <ChevronDown
+            size={12}
+            className={`chevron ${isOpen ? "rotated" : ""}`}
+          />
+        </button>
+      </div>
 
       {isOpen && (
-        <div className="dropdown-menu">
-          <div className="dropdown-header">
-            <span>Note Type</span>
+        <Portal>
+          <div
+            ref={menuRef}
+            className="dropdown-menu portal-dropdown-menu"
+            style={{
+              ...(menuStyle || {}),
+              zIndex: 2147483647,
+              pointerEvents: "auto",
+            }}
+            role="menu"
+          >
+            <div className="dropdown-header">
+              <span>Note Type</span>
+            </div>
+            {NOTE_TYPES.map((type) => {
+              const Icon = type.icon;
+              const selected = type.value === selectedType;
+              return (
+                <button
+                  key={type.value}
+                  className={`dropdown-item ${selected ? "selected" : ""}`}
+                  onMouseDown={(e) => e.preventDefault()} // keep open
+                  onClick={() => handleTypeSelect(type)}
+                  role="menuitem"
+                >
+                  <div className="item-icon">
+                    <Icon size={16} />
+                  </div>
+                  <div className="item-content">
+                    <div className="item-label">{type.label}</div>
+                    <div className="item-description">{type.description}</div>
+                  </div>
+                  {selected && (
+                    <div className="selected-indicator">
+                      <div className="selected-dot" />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
-          {NOTE_TYPES.map((type) => (
-            <button
-              key={type.value}
-              className={`dropdown-item ${
-                type.value === selectedType ? "selected" : ""
-              }`}
-              onClick={() => handleTypeSelect(type)}
-            >
-              <div className="item-icon">
-                <type.icon size={16} />
-              </div>
-              <div className="item-content">
-                <div className="item-label">{type.label}</div>
-                <div className="item-description">{type.description}</div>
-              </div>
-              {type.value === selectedType && (
-                <div className="selected-indicator">
-                  <div className="selected-dot"></div>
-                </div>
-              )}
-            </button>
-          ))}
-        </div>
+        </Portal>
       )}
-    </div>
+    </>
   );
 };
 

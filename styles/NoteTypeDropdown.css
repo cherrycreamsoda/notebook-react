@@ -241,3 +241,18 @@
     font-size: 11px;
   }
 }
+
+/* Portal menu variant styling — ensures pointer events & appearance when rendered at body level */
+.portal-dropdown-menu {
+  pointer-events: auto !important;
+  position: absolute; /* overridden by inline style but fallback is fine */
+  z-index: 2147483647 !important;
+  min-width: 280px;
+  background: rgba(32, 32, 32, 0.95);
+  border: 1px solid #404040;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
