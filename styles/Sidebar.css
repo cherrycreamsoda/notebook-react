@@ -566,7 +566,6 @@
 
 .note-action-btn.pin.active {
   color: #fbbf24 !important;
-  background-color: rgba(251, 191, 36, 0.1) !important;
 }
 
 .note-action-btn.pin.active:hover {
@@ -576,7 +575,6 @@
 
 .note-item .note-action-btn.pin.active {
   color: #fbbf24 !important;
-  background-color: rgba(251, 191, 36, 0.1) !important;
 }
 
 .note-item:hover .note-action-btn.pin.active {
@@ -595,8 +593,9 @@
 }
 
 .note-action-btn.delete:hover {
-  color: #991b1b;
-  background: #f36e6e;
+  color: #da3036 !important;
+  background-color: #3d1719 !important;
+  border-color: #991b1b !important;
 }
 
 .note-action-btn.restore:hover {
@@ -606,6 +605,66 @@
 .note-action-btn.permanent-delete:hover {
   color: #ff8989;
   background-color: #7c0b0b;
+}
+
+/* --- Show pin always when note is pinned; keep other actions hidden until hover --- */
+
+/* make action area visible for pinned notes */
+.note-item.pinned .note-actions {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  display: flex !important; /* ensure layout preserved */
+}
+
+/* hide non-pin action buttons for pinned notes by default */
+.note-item.pinned .note-action-btn:not(.pin) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+/* on hover show other action buttons again */
+.note-item.pinned:hover .note-action-btn:not(.pin) {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
+}
+
+/* ensure pin button is visible and interactive */
+.note-item.pinned .note-action-btn.pin,
+.note-item.pinned .note-action-btn.pin.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* end pinned overrides */
+
+@keyframes selectedPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+.notes-list .note-item:not(:first-child) {
+  position: relative;
+}
+
+.notes-list .note-item:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: -5.5px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #2a2a2a81; /* dark gray line */
 }
 
 @keyframes slideInFromLeft {

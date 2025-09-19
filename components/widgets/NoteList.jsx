@@ -304,9 +304,9 @@ const NoteItem = ({
 
   return (
     <div
-      className={`note-item ${isSelected ? "selected" : ""} ${
-        isKeyboardSelected ? "keyboard-selected" : ""
-      }`}
+      className={`note-item ${note.pinned ? "pinned" : ""} ${
+        isSelected ? "selected" : ""
+      } ${isKeyboardSelected ? "keyboard-selected" : ""}`}
       style={{ "--item-index": index }}
       onClick={onSelect}
     >
