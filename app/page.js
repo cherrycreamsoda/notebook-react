@@ -22,7 +22,7 @@ function PageContent() {
   const [backendConnected, setBackendConnected] = useState(false);
   const [isTransitioningFullscreen, setIsTransitioningFullscreen] =
     useState(false);
-  const [headerBackgroundEnabled, setHeaderBackgroundEnabled] = useState(true);
+  const [headerBackgroundEnabled, setHeaderBackgroundEnabled] = useState(false);
   const topBarFullscreenClass = isFullscreen
     ? fullscreenStyles.fullscreenTopBar
     : "";

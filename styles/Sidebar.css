@@ -161,6 +161,10 @@
   height: 24px;
 }
 
+.fullscreen-mode .github-btn {
+  transform: translate(-100%, -100%);
+}
+
 .sidebar-content {
   flex: 1;
   display: flex;
